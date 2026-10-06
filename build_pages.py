@@ -17,7 +17,7 @@ from cities import load_cities
 
 ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
-SITE_URL = "https://example.com/"  # Placeholder: set to the deployed domain.
+SITE_URL = "https://transit.yumes.net/"
 UPSTREAM_URL = "https://github.com/camilleroux/montpellier-temps-transport"
 REPO_URL = "https://github.com/yumenohosi/kr-transit-time"
 SITE_NAME = "대중교통 시간 지도"

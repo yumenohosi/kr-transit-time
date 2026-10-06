@@ -8,3 +8,6 @@ __pycache__/
 /data/
 
 .env
+
+# wrangler
+.wrangler/
