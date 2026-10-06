@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
 SITE_URL = "https://example.com/"  # Placeholder: set to the deployed domain.
 UPSTREAM_URL = "https://github.com/camilleroux/montpellier-temps-transport"
+REPO_URL = "https://github.com/yumenohosi/kr-transit-time"
 SITE_NAME = "대중교통 시간 지도"
 LICENCES = {
     "ktdb": ("국가교통DB 제공 자료", "https://www.ktdb.go.kr/www/index.do"),
@@ -114,11 +115,12 @@ def head(*, title: str, description: str, url: str, base: str, image: str, image
 
 
 def header(base: str) -> str:
+    repo_link = f'\n          <a class="topbar-link" href="{REPO_URL}" rel="noopener">GitHub</a>' if REPO_URL else ""
     return f"""    <header class="topbar">
       <nav class="topbar-inner" aria-label="주 메뉴">
         <a class="brand" href="{base}"><img src="{base}favicon.svg" width="22" height="22" alt="" /> {SITE_NAME}</a>
         <div class="topbar-links">
-          <a class="topbar-link" href="{base}{CREDITS_DIR}/">출처와 라이선스</a>
+          <a class="topbar-link" href="{base}{CREDITS_DIR}/">출처와 라이선스</a>{repo_link}
         </div>
       </nav>
     </header>"""
