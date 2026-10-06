@@ -21,10 +21,12 @@ import json
 import re
 import sys
 import zipfile
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+import build_data  # noqa: E402
 from build_data import point_in_ring  # noqa: E402
 from cities import load_city  # noqa: E402
 
@@ -65,6 +67,41 @@ def boundary_test(path: Path):
         )
 
     return inside
+
+
+def reachable_by_land(city: dict, stops: dict, rail_rows: list, bus_rows: list, trip_col: int, stop_col: int) -> list:
+    """Bus rows without the islands cut off from the network (옹진군): an island stays when it has a rail station, or a
+    bus that also serves the mainland or another island kept (over a bridge or a dike)."""
+    build_data.LAT0 = city["lat0"]
+    used = {row[stop_col] for row in rail_rows + bus_rows}
+    points = {stop_id: build_data.lonlat_to_xy(float(stops[stop_id]["stop_lon"]), float(stops[stop_id]["stop_lat"])) for stop_id in used}
+    xs, ys = [x for x, _ in points.values()], [y for _, y in points.values()]
+    pad = build_data.SEA_PAD_METERS
+    islands, _ = build_data.coast_rings(ROOT / "data" / city["slug"], (min(xs) - pad, min(ys) - pad, max(xs) + pad, max(ys) + pad))
+    boxes = [build_data.ring_bounds(ring) for ring in islands]
+
+    def island_of(point):
+        x, y = point
+        return next(
+            (i for i, (ring, (x0, y0, x1, y1)) in enumerate(zip(islands, boxes)) if x0 <= x <= x1 and y0 <= y <= y1 and point_in_ring(point, ring)),
+            None,  # the mainland
+        )
+
+    where = {stop_id: island_of(point) for stop_id, point in points.items()}
+    trips = defaultdict(set)
+    for row in bus_rows:
+        trips[row[trip_col]].add(where[row[stop_col]])
+    reached = {None} | {where[row[stop_col]] for row in rail_rows}
+    grown = True
+    while grown:
+        grown = False
+        for places in trips.values():
+            if places & reached and not places <= reached:
+                reached |= places
+                grown = True
+    cut_off = {i for i in where.values() if i not in reached}
+    print(f"  육지와 이어지지 않은 섬 {len(cut_off)}곳의 버스 정류장 제외")
+    return [row for row in bus_rows if where[row[stop_col]] in reached]
 
 
 def write_table(archive: zipfile.ZipFile, name: str, header: list, rows) -> None:
@@ -120,6 +157,9 @@ def main() -> None:
     lines = {line_name(routes[trips[row[trip_col]]["route_id"]], prefix) for row in stop_times if inside(row[stop_col])}
     kept_trips = {trip_id for trip_id, trip in trips.items() if line_name(routes[trip["route_id"]], prefix) in lines}
     stop_times = [row for row in stop_times if row[trip_col] in kept_trips]
+    if with_bus and city.get("coastline"):
+        rail_rows = [row for row in stop_times if in_city(float(stops[row[stop_col]]["stop_lon"]), float(stops[row[stop_col]]["stop_lat"]))]
+        bus_stop_times = reachable_by_land(city, stops, rail_rows, bus_stop_times, trip_col, stop_col)
     # A bus trip needs two stops in the city to ride between them.
     bus_counts = {}
     for row in bus_stop_times:

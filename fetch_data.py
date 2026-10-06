@@ -43,7 +43,10 @@ def overpass(query: str) -> bytes:
         for url in OVERPASS_URLS:
             try:
                 body = download(url, payload)
-                json.loads(body)
+                # A query out of time or memory still answers 200, with what it got so far and a remark.
+                remark = json.loads(body).get("remark", "")
+                if "error" in remark:
+                    raise RuntimeError(remark)
                 return body
             except Exception as error:  # noqa: BLE001 - Overpass is often busy, just retry
                 print(f"  {url} failed ({error}), retrying…")
@@ -183,12 +186,35 @@ def main() -> None:
     if boundaries.get("ids"):
         # Some districts are not found inside their city's area (Daejeon): listed by relation id instead.
         query = f'[out:json][timeout:180];relation(id:{",".join(str(i) for i in boundaries["ids"])});out geom;'
+        payload = json.loads(overpass(query))
     else:
-        query = (
-            f'[out:json][timeout:180];area["ISO3166-2"="{boundaries["area"]}"]->.a;'
-            f'relation["boundary"="administrative"]["admin_level"="{boundaries["adminLevel"]}"](area.a);out geom;'
-        )
-    payload = json.loads(overpass(query))
+        # One area or several (수도권: Seoul, Incheon and Gyeonggi).
+        areas = boundaries["area"] if isinstance(boundaries["area"], list) else [boundaries["area"]]
+        payload, queries = {"elements": []}, []
+        for code in areas:
+            query = (
+                f'[out:json][timeout:600];area["ISO3166-2"="{code}"]->.a;.a out tags;'
+                f'relation["boundary"="administrative"]["admin_level"="{boundaries["adminLevel"]}"](area.a);out geom;'
+            )
+            # Some Overpass mirrors answer an area query with nothing, and no error: ask again.
+            for _ in range(5):
+                elements = json.loads(overpass(query))["elements"]
+                if any(e["type"] == "relation" for e in elements):
+                    break
+                print(f"  {code}: 경계가 비어 있음, 다시 요청…")
+            else:
+                sys.exit(f"{code} 경계를 받지 못했습니다")
+            region = re.sub("(특별시|광역시|특별자치도|도)$", "", next(e for e in elements if e["type"] == "area")["tags"]["name"])
+            payload["elements"] += [{**e, "region": region} for e in elements if e["type"] == "relation"]
+            queries.append(query)
+        query = " + ".join(queries)
+        # The same district name in two cities (서울 중구, 인천 중구): the later ones get their city's name.
+        seen = set()
+        for element in payload["elements"]:
+            name = element["tags"].get("name")
+            if name in seen:
+                element["tags"] = {**element["tags"], "name": f"{element['region']} {name}"}
+            seen.add(name)
     # The city itself sometimes comes back with its districts (부산광역시 among the 구 of Busan).
     payload["elements"] = [element for element in payload["elements"] if element["tags"].get("name") != city["metropole"]]
     (out / "communes.geojson").write_text(json.dumps(boundaries_geojson(payload), ensure_ascii=False), encoding="utf-8")

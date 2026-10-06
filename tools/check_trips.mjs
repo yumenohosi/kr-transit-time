@@ -2,7 +2,10 @@ import fs from "fs";
 // Sondage des trajets : temps depuis le centre jusqu'aux terminus et aux gares, avec la vitesse porte à porte.
 // Usage : node tools/check_trips.mjs <ville>   (une vitesse anormale est signalée par ⚠)
 const slug = process.argv[2];
-const d = JSON.parse(fs.readFileSync(`site/data/${slug}.json`));
+// Le JSON compact se déplie avec la même fonction que le site (site/app.js, expandData).
+const app = fs.readFileSync("site/app.js", "utf8");
+const expandData = new Function(`${app.slice(app.indexOf("function expandData"), app.indexOf("async function init"))}; return expandData;`)();
+const d = expandData(JSON.parse(fs.readFileSync(`site/data/${slug}.json`)));
 const city = JSON.parse(fs.readFileSync(`cities/${slug}.json`));
 const rs = d.routeStates, st = d.stations, ri = d.routeInfo, rail = (r) => ri[r].rail;
 const W = d.meta.walkMetersPerMinute, hyp = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -19,7 +22,7 @@ rs.forEach((r, k) => { const o = dist[k] + r.access; if (o < out[r.stationIndex]
 // targets: termini of each rail line (stations of the line farthest apart) + stations named "Gare"
 const targets = new Map();
 for (const [id, info] of Object.entries(ri)) { if (!info.rail) continue;
-  const sts = [...new Set(rs.filter((r) => r.routeId === id).map((r) => r.stationIndex))];
+  const sts = [...new Set(rs.filter((r) => String(r.routeId) === id).map((r) => r.stationIndex))];
   let a = sts[0], bb = sts[0], md = 0; for (const i of sts) for (const j of sts) { const dd = hyp(st[i].point, st[j].point); if (dd > md) { md = dd; a = i; bb = j; } }
   targets.set(a, `terminus ${info.name}`); targets.set(bb, `terminus ${info.name}`); }
 st.forEach((s, i) => { if (s.rail && /^gare\b|gare /i.test(s.name) && !targets.has(i)) targets.set(i, "gare"); });

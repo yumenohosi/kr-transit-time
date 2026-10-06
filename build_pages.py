@@ -306,6 +306,7 @@ def render_city(template: Template, cities: list[dict], city: dict) -> str:
         "railStations": city["railStations"],
         "busNoun": city["busNoun"],
         "geocoderUrl": city.get("geocoderUrl"),
+        "maxMinutes": city.get("maxMinutes"),
     }
     data_credit = f'시간표&nbsp;: <a href="{esc(city["gtfsDataset"])}">GTFS {esc(city["network"])}</a> ({esc(city["metropole"])}).'
     hidden = "" if stats["busLines"] else " hidden"

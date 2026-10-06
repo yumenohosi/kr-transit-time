@@ -1,0 +1,77 @@
+{
+  "slug": "sudogwon",
+  "order": 0,
+  "name": "수도권",
+  "kind": "metro",
+  "network": "수도권 전철",
+  "metropole": "서울특별시",
+  "boundaries": {
+    "area": [
+      "KR-11",
+      "KR-28",
+      "KR-41"
+    ],
+    "adminLevel": "6"
+  },
+  "gtfsManual": "국가교통DB GTFS를 tools/ktdb_gtfs.py로 변환",
+  "gtfsUrl": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsDataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsLicence": "ktdb",
+  "railGeometry": "osm",
+  "osmRailRoutes": "subway|light_rail|train",
+  "osmRefAliases": {
+    "1": "1호선",
+    "2": "2호선",
+    "3": "3호선",
+    "4": "4호선",
+    "5": "5호선",
+    "6": "6호선",
+    "7": "7호선",
+    "8": "8호선",
+    "9": "9호선",
+    "경의·중앙": "경의중앙선",
+    "수인·분당": "수인분당선",
+    "경춘": "경춘선",
+    "경강": "경강선",
+    "서해": "서해선",
+    "신분당": "신분당선",
+    "AREX": "공항철도",
+    "공항철도": "공항철도",
+    "GTX-A": "GTX-A",
+    "인천1": "인천1호선",
+    "I2": "인천2호선",
+    "Silim": "신림선",
+    "U": "의정부경전철",
+    "W": "우이신설경전철",
+    "김포 골드라인": "김포도시철도"
+  },
+  "rivers": [
+    "한강"
+  ],
+  "defaultFrom": {
+    "lat": 37.56548,
+    "lon": 126.97711,
+    "label": "시청"
+  },
+  "searchExample": "판교",
+  "published": "2026-10-06",
+  "parksBbox": [
+    37.42,
+    126.76,
+    37.71,
+    127.19
+  ],
+  "view": "land",
+  "linePrefix": "서울",
+  "area": "수도권",
+  "communes": "served",
+  "coastline": true,
+  "gridCell": 400,
+  "osmBbox": [
+    36.89,
+    125.75,
+    38.28,
+    127.85
+  ],
+  "maxMinutes": 90
+}

@@ -389,6 +389,8 @@ def extract_communes(data_dir: Path, city: dict, stations: Sequence[dict]) -> Tu
     # Some metropolises are far larger than their urban network (Aix-Marseille-Provence): keep only the listed
     # communes, or the ones actually served.
     wanted = served_communes(payload, stations) if city.get("communes") == "served" else set(city.get("communes", []))
+    if city.get("communes") == "served":
+        print("  제외:", ", ".join(sorted({f["properties"]["nom"] for f in payload["features"]} - wanted)) or "없음")
     communes = []
     all_polygons: MultiPolygon = []
     for feature in sorted(payload["features"], key=lambda f: f["properties"]["nom"]):
@@ -481,12 +483,11 @@ def extract_water_and_parks(data_dir: Path, bounds) -> Tuple[MultiPolygon, Multi
     return masked, water, parks
 
 
-def extract_sea(data_dir: Path, rect: Tuple[float, float, float, float]) -> MultiPolygon:
-    """Sea inside `rect`, from the OSM coastline (land on its left): the rectangle with the land as holes. Korean
-    district boundaries run far out to sea; the sea is cut out of them like a large lake."""
+def coast_rings(data_dir: Path, rect: Tuple[float, float, float, float]) -> Tuple[List[Ring], List[Ring]]:
+    """Land inside `rect` from the OSM coastline (land on its left): islands, and the mainland cut by the rectangle."""
     path = data_dir / "osm_coastline.json"
     if not path.exists():
-        return []
+        return [], []
     x0, y0, x1, y1 = rect
     starts = {}
     for element in load_json(path)["elements"]:
@@ -556,6 +557,7 @@ def extract_sea(data_dir: Path, rect: Tuple[float, float, float, float]) -> Mult
             if t1 < 1.0:
                 pieces.append(piece)
                 piece = None
+    islands, rings = rings, []
     # Each piece leaves the rectangle with the land on its left: follow the edge counter-clockwise to the next one in.
     entries = [perimeter(piece[0]) for piece in pieces]
     free = set(range(len(pieces)))
@@ -577,7 +579,17 @@ def extract_sea(data_dir: Path, rect: Tuple[float, float, float, float]) -> Mult
             free.discard(following)
             ring.extend(pieces[following])
         rings.append(ring)
-    land = [simplify_ring(ring, MIN_RING_DISTANCE) for ring in rings]
+    return islands, rings
+
+
+def extract_sea(data_dir: Path, rect: Tuple[float, float, float, float], keep_island=lambda ring: True) -> MultiPolygon:
+    """Sea inside `rect`: the rectangle with the land as holes. Korean district boundaries run far out to sea; the sea
+    is cut out of them like a large lake. Islands left out by `keep_island` are drawn as sea."""
+    islands, mainland = coast_rings(data_dir, rect)
+    if not islands and not mainland:
+        return []
+    x0, y0, x1, y1 = rect
+    land = [simplify_ring(ring, MIN_RING_DISTANCE) for ring in mainland + [ring for ring in islands if keep_island(ring)]]
     land = [ring for ring in land if abs(ring_area(ring)) >= MIN_WATER_AREA]
     return [[[(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)], *land]]
 
@@ -1089,6 +1101,42 @@ def write_provenance(city: dict, data_dir: Path, reference_date: date, route_inf
     return path
 
 
+def metres(value):
+    """Coordinates to the whole metre, through nested lists."""
+    return round(value) if isinstance(value, (int, float)) else [metres(item) for item in value]
+
+
+def compact(output: dict) -> dict:
+    """Shorter JSON for the browser, which rebuilds the full shape (site/app.js, expandData): routes become indexes
+    into `lines`, states, stations and cells become flat arrays, coordinates whole metres, and what the browser can
+    derive (stationStates, cell positions, outlines, mask, station ids) is left out."""
+    meta = output["meta"]
+    index = {route_id: i for i, route_id in enumerate(output["routeInfo"])}
+    access = {state["routeId"]: state["access"] for state in output["routeStates"]}
+    areas = lambda items: [{"name": area["name"], "polygons": metres(area["polygons"]), "label": metres(area["label"])} for area in items]
+    return {
+        "meta": meta,
+        "lines": [[info["name"], info["mode"], info["color"], int(info["rail"]), access.get(route_id, 0.0)] for route_id, info in output["routeInfo"].items()],
+        "boroughs": areas(output["boroughs"]),
+        **({"arrondissements": areas(output["arrondissements"])} if "arrondissements" in output else {}),
+        **{key: metres(output[key]) for key in ("context", "rivers", "water", "coastSea", "parks") if key in output},
+        **({"bridges": [[metres(a), metres(b), length] for a, b, length in output["bridges"]]} if "bridges" in output else {}),
+        "routes": [{**route, "points": metres(route["points"])} for route in output["routes"]],
+        "stations": {
+            "name": [station["name"] for station in output["stations"]],
+            "point": [coordinate for station in output["stations"] for coordinate in metres(station["point"])],
+            "routes": [[index[route_id] for route_id in station["routes"]] for station in output["stations"]],
+        },
+        "states": {
+            "station": [state["stationIndex"] for state in output["routeStates"]],
+            "route": [index[state["routeId"]] for state in output["routeStates"]],
+            "wait": [state["wait"] for state in output["routeStates"]],
+        },
+        "adjacency": [[value for edge in edges for value in edge] for edges in output["adjacency"]],
+        "cells": [[cell["row"] * meta["gridCols"] + cell["col"], *(value for station, meters in cell["access"] for value in (station, round(meters)))] for cell in output["cells"]],
+    }
+
+
 def main() -> None:
     global LAT0
     if len(sys.argv) < 2:
@@ -1105,15 +1153,25 @@ def main() -> None:
     arrondissements = extract_arrondissements(data_dir, city)
     bounds = multipolygon_bounds(land, LAND_PAD_METERS)
     # The sea reaches past the frame, for the zoomed-out view (the coastline is fetched 0.15° around the city).
-    sea = extract_sea(data_dir, (bounds[0] - SEA_PAD_METERS, bounds[1] - SEA_PAD_METERS, bounds[2] + SEA_PAD_METERS, bounds[3] + SEA_PAD_METERS))
+    # Islands without a stop are left out: tools/ktdb_gtfs.py already dropped the ones cut off from the network.
+    points = [station["point"] for station in complexes]
+
+    def has_stop(ring: Ring) -> bool:
+        min_x, min_y, max_x, max_y = ring_bounds(ring)
+        return any(point_in_ring(point, ring) for point in points if min_x <= point[0] <= max_x and min_y <= point[1] <= max_y)
+
+    sea = extract_sea(
+        data_dir, (bounds[0] - SEA_PAD_METERS, bounds[1] - SEA_PAD_METERS, bounds[2] + SEA_PAD_METERS, bounds[3] + SEA_PAD_METERS), has_stop
+    )
     if sea:
         # Frame the land only, not the districts' waters.
         sea_set = PolygonSet(sea)
         coast = [point for polygon in land for point in polygon[0] if not sea_set.contains(point)]
         bounds = (min(x for x, _ in coast) - LAND_PAD_METERS, min(y for _, y in coast) - LAND_PAD_METERS,
                   max(x for x, _ in coast) + LAND_PAD_METERS, max(y for _, y in coast) + LAND_PAD_METERS)
-    cols = round((bounds[2] - bounds[0]) / GRID_CELL_METERS)
-    rows = round((bounds[3] - bounds[1]) / GRID_CELL_METERS)
+    cell_meters = city.get("gridCell", GRID_CELL_METERS)
+    cols = round((bounds[2] - bounds[0]) / cell_meters)
+    rows = round((bounds[3] - bounds[1]) / cell_meters)
     masked_water, water, parks = extract_water_and_parks(data_dir, bounds)
     context = extract_context(data_dir, city)
 
@@ -1203,7 +1261,7 @@ def main() -> None:
     }
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(output, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    output_path.write_text(json.dumps(compact(output), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     stats = network_stats(city, route_info, stations, route_states, station_states, adjacency, rivers)
     provenance_path = write_provenance(city, data_dir, reference_date, route_info, stations, stats)
     print(f"Wrote {provenance_path.relative_to(ROOT)}")

@@ -16,7 +16,7 @@
     <meta property="og:title" content="대구 대중교통 시간 지도" />
     <meta property="og:description" content="대구 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(대구 도시철도)." />
     <meta property="og:url" content="https://transit.yumes.net/daegu/" />
-    <meta property="og:image" content="https://transit.yumes.net/og/daegu.jpg?v=b5da62c6" />
+    <meta property="og:image" content="https://transit.yumes.net/og/daegu.jpg?v=b3f11c93" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="반월당에서 출발하는 대중교통 소요시간으로 색칠한 대구 지도, 15분·30분 등시선 포함." />
@@ -24,7 +24,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="대구 대중교통 시간 지도" />
     <meta name="twitter:description" content="대구 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(대구 도시철도)." />
-    <meta name="twitter:image" content="https://transit.yumes.net/og/daegu.jpg?v=b5da62c6" />
+    <meta name="twitter:image" content="https://transit.yumes.net/og/daegu.jpg?v=b3f11c93" />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -129,7 +129,7 @@
     <link rel="stylesheet" href="../styles.css?v=0afb52df" />
   </head>
   <body>
-    <script id="city-config" type="application/json">{"slug": "daegu", "name": "대구", "dataVersion": "9f111fe0", "defaultFrom": {"lat": 35.86457, "lon": 128.59333, "label": "반월당"}, "railNoun": "지하철", "railStations": "지하철역", "busNoun": "버스", "geocoderUrl": null}</script>
+    <script id="city-config" type="application/json">{"slug": "daegu", "name": "대구", "dataVersion": "7db42c47", "defaultFrom": {"lat": 35.86457, "lon": 128.59333, "label": "반월당"}, "railNoun": "지하철", "railStations": "지하철역", "busNoun": "버스", "geocoderUrl": null, "maxMinutes": null}</script>
     <header class="topbar">
       <nav class="topbar-inner" aria-label="주 메뉴">
         <a class="brand" href="../"><img src="../favicon.svg" width="22" height="22" alt="" /> 대중교통 시간 지도</a>
@@ -153,6 +153,7 @@
             <button id="cityClose" type="button" class="icon-button" aria-label="닫기">×</button>
           </div>
           <nav class="city-panel-list" aria-label="도시">
+            <a class="city-item" href="../sudogwon/" data-name="수도권"><img src="../og/thumb-sudogwon.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>수도권</strong><small>지하철 · 수도권 전철</small></span></a>
             <a class="city-item" href="../seoul/" data-name="서울"><img src="../og/thumb-seoul.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>서울</strong><small>지하철 · 수도권 전철</small></span></a>
             <a class="city-item" href="../busan/" data-name="부산"><img src="../og/thumb-busan.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>부산</strong><small>지하철 · 부산 도시철도</small></span></a>
             <a class="city-item current" href="../daegu/" aria-current="page" data-name="대구"><img src="../og/thumb-daegu.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>대구</strong><small>지하철 · 대구 도시철도</small></span></a>
@@ -279,6 +280,13 @@
       <section class="section" aria-labelledby="cities-title">
         <h2 id="cities-title">다른 도시</h2>
         <div class="city-grid">
+          <a class="city-card" href="../sudogwon/">
+            <img src="../og/thumb-sudogwon.jpg" width="600" height="315" alt="" loading="lazy" />
+            <span class="city-card-body">
+              <h3>수도권 대중교통 시간 지도</h3>
+              <span>지하철역의 29%가 중심(시청)에서 30분 안 · 수도권 전철</span>
+            </span>
+          </a>
           <a class="city-card" href="../seoul/">
             <img src="../og/thumb-seoul.jpg" width="600" height="315" alt="" loading="lazy" />
             <span class="city-card-body">
@@ -313,7 +321,7 @@
 
     <footer class="site-footer">
       <div class="footer-inner">
-        <p class="footer-links">도시&nbsp;: <a href="../seoul/">서울</a> · <a href="../busan/">부산</a> · <a href="../daegu/">대구</a> · <a href="../daejeon/">대전</a> · <a href="../gwangju/">광주</a></p>
+        <p class="footer-links">도시&nbsp;: <a href="../sudogwon/">수도권</a> · <a href="../seoul/">서울</a> · <a href="../busan/">부산</a> · <a href="../daegu/">대구</a> · <a href="../daejeon/">대전</a> · <a href="../gwangju/">광주</a></p>
         <p class="footer-links"><a href="../credits/">출처와 라이선스</a></p>
         <p class="footer-credits">
           Camille Roux의 <a href="https://github.com/camilleroux/montpellier-temps-transport" rel="noopener">À portée de tram</a>(MIT 라이선스)을 포크해 만들었습니다.
@@ -326,6 +334,6 @@
     </footer>
 
     <div id="toast" class="toast" role="status" hidden></div>
-    <script type="module" src="../app.js?v=53fce2d5"></script>
+    <script type="module" src="../app.js?v=12c0be43"></script>
   </body>
 </html>

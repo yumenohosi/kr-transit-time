@@ -1,0 +1,261 @@
+{
+  "city": "수도권",
+  "builtAt": "2026-10-06T11:20:13+00:00",
+  "referenceDate": "2026-10-06",
+  "serviceWindow": "7h–20h",
+  "gtfs": {
+    "network": "수도권 전철",
+    "dataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "source": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "how": "manual",
+    "fetchedAt": "2026-10-06T11:16:33+00:00",
+    "bytes": 106455343,
+    "sha256": "f7dd1a28eeffd249d0a87c2ef4156e7e7c4effffccedb9eee16f0cbce764963b",
+    "feedInfo": null,
+    "servicePeriod": [
+      "2017-01-01",
+      "2030-12-31"
+    ]
+  },
+  "communes": {
+    "metropole": "서울특별시",
+    "boundaries": {
+      "area": [
+        "KR-11",
+        "KR-28",
+        "KR-41"
+      ],
+      "adminLevel": "6"
+    },
+    "source": "Overpass API: [out:json][timeout:600];area[\"ISO3166-2\"=\"KR-11\"]->.a;.a out tags;relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"6\"](area.a);out geom; + [out:json][timeout:600];area[\"ISO3166-2\"=\"KR-28\"]->.a;.a out tags;relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"6\"](area.a);out geom; + [out:json][timeout:600];area[\"ISO3166-2\"=\"KR-41\"]->.a;.a out tags;relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"6\"](area.a);out geom;",
+    "how": "download",
+    "fetchedAt": "2026-10-06T10:52:51+00:00",
+    "bytes": 1556619,
+    "sha256": "d71674fd771b0fd4361879830bed9f7a7bc8de42b78deb1e3ca60867c88bac91"
+  },
+  "openStreetMap": {
+    "licence": "ODbL, © contributeurs OpenStreetMap",
+    "osm_rail": {
+      "source": "Overpass API: [out:json][timeout:110];relation[\"route\"~\"^(subway|light_rail|train)$\"](36.89,125.75,38.28,127.85);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T10:53:01+00:00",
+      "bytes": 16115618,
+      "sha256": "23ae1d39330cc03434855b8d97ed7c527c7a0a912c04313fdb993e914bc95e4f"
+    },
+    "osm_water_parks": {
+      "source": "Overpass API: [out:json][timeout:180];(relation[\"natural\"=\"water\"](36.89,125.75,38.28,127.85);way[\"natural\"=\"water\"](36.89,125.75,38.28,127.85);relation[\"leisure\"=\"park\"](37.42,126.76,37.71,127.19);way[\"leisure\"=\"park\"](37.42,126.76,37.71,127.19););out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T10:55:41+00:00",
+      "bytes": 25943858,
+      "sha256": "944947b99b68529fe35b75cecb89a6a8fcb3488db0cad9d54d45896dafa023d5"
+    },
+    "osm_rivers": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"waterway\"=\"river\"][\"name\"~\"^(한강)( - .*)?$\"][\"tunnel\"!~\".\"](36.89,125.75,38.28,127.85);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T10:59:21+00:00",
+      "bytes": 19393,
+      "sha256": "76035622961d22770caf43db297a3e432e2369311a5c5eef6d009bfec362c9d4"
+    },
+    "osm_bridges": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"bridge\"][\"highway\"][\"highway\"!~\"^(motorway|motorway_link|trunk|trunk_link|construction|proposed)$\"][\"foot\"!=\"no\"](36.89,125.75,38.28,127.85);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T11:06:46+00:00",
+      "bytes": 12315908,
+      "sha256": "c8003aaeea1f2b5ffe0f250b581eb21f85eebf6bc05127bc3d10c2a3bc754d91"
+    }
+  },
+  "railGeometry": "OpenStreetMap",
+  "excludedRoutes": [],
+  "network": {
+    "lines": {
+      "metro": 24,
+      "bus": 4017
+    },
+    "stops": 33846,
+    "railStations": 656
+  },
+  "stats": {
+    "lines": [
+      {
+        "name": "1호선",
+        "mode": "metro",
+        "color": "#0052A4",
+        "stations": 102,
+        "headway": 9.5
+      },
+      {
+        "name": "2호선",
+        "mode": "metro",
+        "color": "#00A84D",
+        "stations": 51,
+        "headway": 4.3
+      },
+      {
+        "name": "3호선",
+        "mode": "metro",
+        "color": "#EF7C1C",
+        "stations": 44,
+        "headway": 5.7
+      },
+      {
+        "name": "4호선",
+        "mode": "metro",
+        "color": "#00A5DE",
+        "stations": 51,
+        "headway": 8.3
+      },
+      {
+        "name": "5호선",
+        "mode": "metro",
+        "color": "#996CAC",
+        "stations": 56,
+        "headway": 5.2
+      },
+      {
+        "name": "6호선",
+        "mode": "metro",
+        "color": "#CD7C2F",
+        "stations": 39,
+        "headway": 3.3
+      },
+      {
+        "name": "7호선",
+        "mode": "metro",
+        "color": "#747F00",
+        "stations": 53,
+        "headway": 8.2
+      },
+      {
+        "name": "8호선",
+        "mode": "metro",
+        "color": "#E6186C",
+        "stations": 24,
+        "headway": 6.6
+      },
+      {
+        "name": "9호선",
+        "mode": "metro",
+        "color": "#BDB092",
+        "stations": 38,
+        "headway": 8.9
+      },
+      {
+        "name": "경강선",
+        "mode": "metro",
+        "color": "#003DA5",
+        "stations": 12,
+        "headway": 17.3
+      },
+      {
+        "name": "경춘선",
+        "mode": "metro",
+        "color": "#0C8E72",
+        "stations": 25,
+        "headway": 22.6
+      },
+      {
+        "name": "서해선",
+        "mode": "metro",
+        "color": "#81A914",
+        "stations": 21,
+        "headway": 12.6
+      },
+      {
+        "name": "신림선",
+        "mode": "metro",
+        "color": "#6789CA",
+        "stations": 11,
+        "headway": 5.5
+      },
+      {
+        "name": "공항철도",
+        "mode": "metro",
+        "color": "#0090D2",
+        "stations": 14,
+        "headway": 7.8
+      },
+      {
+        "name": "신분당선",
+        "mode": "metro",
+        "color": "#D4003B",
+        "stations": 16,
+        "headway": 6.5
+      },
+      {
+        "name": "GTX-A",
+        "mode": "metro",
+        "color": "#9A6292",
+        "stations": 9,
+        "headway": 7.6
+      },
+      {
+        "name": "경의중앙선",
+        "mode": "metro",
+        "color": "#77C4A3",
+        "stations": 57,
+        "headway": 12.6
+      },
+      {
+        "name": "수인분당선",
+        "mode": "metro",
+        "color": "#F5A200",
+        "stations": 63,
+        "headway": 11.0
+      },
+      {
+        "name": "용인경전철",
+        "mode": "metro",
+        "color": "#888888",
+        "stations": 15,
+        "headway": 4.8
+      },
+      {
+        "name": "인천1호선",
+        "mode": "metro",
+        "color": "#7CA8D5",
+        "stations": 30,
+        "headway": 6.8
+      },
+      {
+        "name": "인천2호선",
+        "mode": "metro",
+        "color": "#ED8B00",
+        "stations": 27,
+        "headway": 4.4
+      },
+      {
+        "name": "김포도시철도",
+        "mode": "metro",
+        "color": "#A17800",
+        "stations": 10,
+        "headway": 4.0
+      },
+      {
+        "name": "의정부경전철",
+        "mode": "metro",
+        "color": "#FDA600",
+        "stations": 16,
+        "headway": 4.7
+      },
+      {
+        "name": "우이신설경전철",
+        "mode": "metro",
+        "color": "#B0CE18",
+        "stations": 13,
+        "headway": 4.1
+      }
+    ],
+    "railStations": 656,
+    "busLines": 4017,
+    "center": "시청",
+    "within15": 4,
+    "within30": 29,
+    "farthestStation": "신창",
+    "farthestMinutes": 110,
+    "ogTrip": {
+      "name": "버티고개",
+      "lat": 37.54778,
+      "lon": 127.00626
+    }
+  }
+}

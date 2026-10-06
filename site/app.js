@@ -16,7 +16,7 @@ const MODE_LABELS = {
   busway: "BRT",
   bus: "버스",
 };
-const DEFAULT_MAX = 45;
+const DEFAULT_MAX = CITY.maxMinutes ?? 45; // une grande région (수도권) a besoin d'une échelle plus longue
 const ISOCHRONE_OPTIONS = [15, 30, 45, 60];
 const DEFAULT_ISOCHRONES = [15, 30];
 const REACH_MINUTES = 30;
@@ -785,14 +785,6 @@ function drawIsochrones() {
 
 function drawStops() {
   const { stations } = app.data;
-  if (app.includeBus) {
-    ctx.fillStyle = "rgba(60, 60, 60, 0.45)";
-    for (const station of stations) {
-      if (station.rail) continue;
-      const [x, y] = project(station.point);
-      ctx.fillRect(x - 1, y - 1, 2, 2);
-    }
-  }
   const radius = app.view.scale > STOP_LABEL_SCALE ? 3.2 : 2.2;
   for (const station of stations) {
     if (!station.rail) continue;
@@ -1543,10 +1535,46 @@ document.addEventListener("click", (event) => {
 
 // --- Démarrage ----------------------------------------------------------------
 
+/** Le JSON compact de build_data.py (compact) remis dans la forme complète utilisée partout ici. */
+function expandData(raw) {
+  const pairs = (flat) => Array.from({ length: flat.length / 2 }, (_, i) => [flat[2 * i], flat[2 * i + 1]]);
+  const routeInfo = raw.lines.map(([name, mode, color, rail]) => ({ name, mode, color, rail: Boolean(rail) }));
+  const stations = raw.stations.name.map((name, i) => {
+    const routes = raw.stations.routes[i];
+    return { name, point: [raw.stations.point[2 * i], raw.stations.point[2 * i + 1]], routes, rail: routes.some((route) => routeInfo[route].rail) };
+  });
+  const routeStates = raw.states.station.map((stationIndex, i) => {
+    const routeId = raw.states.route[i];
+    return { stationIndex, routeId, wait: raw.states.wait[i], access: raw.lines[routeId][4] };
+  });
+  const stationStates = stations.map(() => []);
+  routeStates.forEach((state, i) => stationStates[state.stationIndex].push(i));
+  const { bounds, gridCols, gridRows } = raw.meta;
+  const cellW = (bounds[2] - bounds[0]) / gridCols;
+  const cellH = (bounds[3] - bounds[1]) / gridRows;
+  const cells = raw.cells.map(([grid, ...access]) => {
+    const row = Math.floor(grid / gridCols);
+    const col = grid % gridCols;
+    return { row, col, point: [bounds[0] + (col + 0.5) * cellW, bounds[1] + (row + 0.5) * cellH], access: pairs(access) };
+  });
+  const withOutline = (area) => ({ ...area, outline: area.polygons.map((polygon) => polygon[0]) });
+  return {
+    ...raw,
+    routeInfo,
+    stations,
+    routeStates,
+    stationStates,
+    adjacency: raw.adjacency.map(pairs),
+    cells,
+    boroughs: raw.boroughs.map(withOutline),
+    ...(raw.arrondissements ? { arrondissements: raw.arrondissements.map(withOutline) } : {}),
+  };
+}
+
 async function init() {
   resize();
   const response = await fetch(DATA_URL);
-  app.data = await response.json();
+  app.data = expandData(await response.json());
   app.offset = [app.data.meta.bounds[0], app.data.meta.bounds[1]];
   app.rivers = indexRivers(app.data.rivers);
   app.graph = prepareGraph(app.data);
