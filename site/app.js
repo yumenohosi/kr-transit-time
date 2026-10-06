@@ -1100,12 +1100,16 @@ function parsePair(value) {
   return match ? toWorld(Number(match[1]), Number(match[2])) : null;
 }
 
+function hasBus() {
+  return !$("busToggle").closest("label").hidden;
+}
+
 function syncUrl() {
   const params = new URLSearchParams();
   if (app.from) params.set("from", formatPair(app.from.point));
   if (app.to) params.set("to", formatPair(app.to.point));
   if (app.to && app.heatFrom === "to") params.set("carte", "arrivee");
-  if (app.includeBus) params.set("bus", "1");
+  if (hasBus() && !app.includeBus) params.set("bus", "0");
   if (app.maxMinutes !== DEFAULT_MAX) params.set("max", String(app.maxMinutes));
   const iso = [...app.isochrones].sort((a, b) => a - b).join(",");
   if (iso !== DEFAULT_ISOCHRONES.join(",")) params.set("iso", iso || "0");
@@ -1115,7 +1119,8 @@ function syncUrl() {
 
 function restoreFromUrl() {
   const params = new URLSearchParams(location.search);
-  app.includeBus = params.get("bus") === "1";
+  // Bus compris par défaut quand la ville en a ; « bus=0 » revient au seul métro.
+  app.includeBus = hasBus() && params.get("bus") !== "0";
   $("busToggle").checked = app.includeBus;
   const max = Number(params.get("max"));
   if (max >= 20 && max <= 90) app.maxMinutes = max;
