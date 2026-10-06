@@ -218,7 +218,7 @@ def city_faq(city: dict) -> list[tuple]:
         entries.append(
             (
                 f"{name}에서 버스도 계산되나요?",
-                f"선택할 수 있습니다. 지도 아래 ‘{city['busLabel']}’ 항목을 켜면 됩니다. 기본은 {rail}만 표시합니다. "
+                f"네, 기본으로 버스까지 함께 계산합니다. 지도 아래 ‘{city['busLabel']}’ 항목을 끄면 {rail}만으로 계산합니다. "
                 "드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다.",
             )
         )
@@ -241,7 +241,7 @@ def render_city(template: Template, cities: list[dict], city: dict) -> str:
     stats = city["stats"]
     rail_noun = city["railNoun"]
     description = (
-        f"{city['name']} {rail_noun} 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다"
+        f"{city['name']} 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다"
         f"({city['network']})."
     )
     faq = city_faq(city)
@@ -362,7 +362,7 @@ def render_city(template: Template, cities: list[dict], city: dict) -> str:
 def render_home(template: Template, cities: list[dict]) -> str:
     names = ", ".join(city["name"] for city in cities)
     networks = ", ".join(f"{city['network']}({city['name']})" for city in cities)
-    description = f"{names}의 지하철 소요시간 지도: 출발지를 고르면 도시가 소요시간에 따라 색칠됩니다."
+    description = f"{names}의 대중교통 소요시간 지도: 출발지를 고르면 도시가 소요시간에 따라 색칠됩니다."
     faq = [
         (
             "소요시간은 어디서 오나요?",
@@ -375,8 +375,8 @@ def render_home(template: Template, cities: list[dict]) -> str:
         ),
         (
             "버스도 계산되나요?",
-            "버스 시간표가 있는 도시에서는 지도마다 선택할 수 있습니다. 기본은 지하철·경전철 같은 도시철도만 표시해 노선망의 "
-            "뼈대를 보여 줍니다.",
+            "네, 기본으로 버스까지 함께 계산합니다. 지도마다 버스를 끄면 지하철·경전철 같은 도시철도만으로 계산해 노선망의 "
+            "뼈대를 볼 수 있습니다.",
         ),
         (
             "우리 도시는 왜 없나요?",
@@ -406,12 +406,12 @@ def render_home(template: Template, cities: list[dict]) -> str:
     published = min(city["published"] for city in cities)
     values = {
         "head": head(
-            title=f"{SITE_NAME} · 도시별 지하철 소요시간",
+            title=f"{SITE_NAME} · 도시별 대중교통 소요시간",
             description=description,
             url=SITE_URL,
             base="./",
             image=SITE_URL + "og/home.jpg?v=" + short_hash(SITE / "og" / "home.jpg"),
-            image_alt=f"{names}의 지하철 소요시간 지도.",
+            image_alt=f"{names}의 대중교통 소요시간 지도.",
             published=published,
             graph=graph,
         ),

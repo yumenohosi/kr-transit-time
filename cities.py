@@ -29,8 +29,8 @@ def with_defaults(raw: dict) -> dict:
     city.setdefault("railNoun", RAIL_NOUN[kind])
     city.setdefault("railLabel", RAIL_LABEL[kind])
     city.setdefault("railStations", RAIL_STATIONS[kind])
-    city.setdefault("title", f"{city['name']} {city['railNoun']} 시간 지도")
-    city.setdefault("titleSuffix", f"{city['railNoun']} 소요시간 · {city['network']}")
+    city.setdefault("title", f"{city['name']} 대중교통 시간 지도")
+    city.setdefault("titleSuffix", f"지하철·버스 소요시간 · {city['network']}")
     city.setdefault("busNoun", "버스")
     city.setdefault("busLabel", "버스")
     city.setdefault("area", city["metropole"])
@@ -43,7 +43,7 @@ def with_defaults(raw: dict) -> dict:
     city.setdefault("osmRailBbox", city["osmBbox"])
     city.setdefault(
         "ogAlt",
-        f"{city['defaultFrom']['label']}에서 출발하는 {city['railNoun']} 소요시간으로 색칠한 {city['name']} 지도, "
+        f"{city['defaultFrom']['label']}에서 출발하는 대중교통 소요시간으로 색칠한 {city['name']} 지도, "
         "15분·30분 등시선 포함.",
     )
     return city

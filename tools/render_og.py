@@ -52,7 +52,7 @@ HOME = """<!doctype html><html lang="ko"><head><meta charset="utf-8" />
   img { display: block; width: 100%; height: 190px; object-fit: cover; object-position: center 70%; }
   figcaption { position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 8px; background: #fff; font-weight: 800; font-size: 20px; }
 </style></head><body>
-<header><h1>대중교통 시간 지도</h1><p>지하철 소요시간으로 다시 그린 도시</p></header>
+<header><h1>대중교통 시간 지도</h1><p>대중교통 소요시간으로 다시 그린 도시</p></header>
 <div class="grid">FIGURES</div></body></html>"""
 
 

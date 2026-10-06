@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>부산 지하철 시간 지도 · 지하철 소요시간 · 부산 도시철도</title>
-    <meta name="description" content="부산 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도)." />
+    <title>부산 대중교통 시간 지도 · 지하철·버스 소요시간 · 부산 도시철도</title>
+    <meta name="description" content="부산 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도)." />
     <link rel="canonical" href="https://transit.yumes.net/busan/" />
     <meta name="theme-color" content="#3aa70b" />
     <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
@@ -13,27 +13,27 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:site_name" content="대중교통 시간 지도" />
-    <meta property="og:title" content="부산 지하철 시간 지도" />
-    <meta property="og:description" content="부산 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도)." />
+    <meta property="og:title" content="부산 대중교통 시간 지도" />
+    <meta property="og:description" content="부산 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도)." />
     <meta property="og:url" content="https://transit.yumes.net/busan/" />
-    <meta property="og:image" content="https://transit.yumes.net/og/busan.jpg?v=1247f963" />
+    <meta property="og:image" content="https://transit.yumes.net/og/busan.jpg?v=9ddd20f2" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="서면에서 출발하는 지하철 소요시간으로 색칠한 부산 지도, 15분·30분 등시선 포함." />
+    <meta property="og:image:alt" content="서면에서 출발하는 대중교통 소요시간으로 색칠한 부산 지도, 15분·30분 등시선 포함." />
     <meta property="article:published_time" content="2026-10-06T08:00:00+09:00" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="부산 지하철 시간 지도" />
-    <meta name="twitter:description" content="부산 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도)." />
-    <meta name="twitter:image" content="https://transit.yumes.net/og/busan.jpg?v=1247f963" />
+    <meta name="twitter:title" content="부산 대중교통 시간 지도" />
+    <meta name="twitter:description" content="부산 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도)." />
+    <meta name="twitter:image" content="https://transit.yumes.net/og/busan.jpg?v=9ddd20f2" />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
           "@type": "WebApplication",
-          "name": "부산 지하철 시간 지도",
+          "name": "부산 대중교통 시간 지도",
           "url": "https://transit.yumes.net/busan/",
-          "description": "부산 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도).",
+          "description": "부산 대중교통 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(부산 도시철도).",
           "inLanguage": "ko",
           "applicationCategory": "TravelApplication",
           "operatingSystem": "Web",
@@ -100,7 +100,7 @@
               "name": "부산에서 버스도 계산되나요?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "선택할 수 있습니다. 지도 아래 ‘버스’ 항목을 켜면 됩니다. 기본은 지하철만 표시합니다. 드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다."
+                "text": "네, 기본으로 버스까지 함께 계산합니다. 지도 아래 ‘버스’ 항목을 끄면 지하철만으로 계산합니다. 드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다."
               }
             },
             {
@@ -146,7 +146,7 @@
       </nav>
 
       <section class="hero">
-        <h1><button id="cityTrigger" type="button" class="city-trigger" aria-haspopup="dialog" aria-expanded="false" title="도시 바꾸기">부산<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button> 지하철 시간&nbsp;지도</h1>
+        <h1><button id="cityTrigger" type="button" class="city-trigger" aria-haspopup="dialog" aria-expanded="false" title="도시 바꾸기">부산<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button> 대중교통 시간&nbsp;지도</h1>
         <div id="cityPanel" class="city-panel" role="dialog" aria-label="도시 선택" hidden>
           <div class="city-panel-head">
             <input id="citySearch" type="search" placeholder="도시 검색…" aria-label="도시 검색" autocomplete="off" />
@@ -161,7 +161,7 @@
           </nav>
         </div>
         <p class="lede">
-          지하철 소요시간으로 다시 그린 도시입니다. 출발지를 고르면 부산광역시 곳곳까지 걸리는 시간이 색으로
+          대중교통 소요시간으로 다시 그린 도시입니다. 출발지를 고르면 부산광역시 곳곳까지 걸리는 시간이 색으로
           표시됩니다.
         </p>
         <form id="searchForm" class="search" role="search" autocomplete="off">
@@ -273,7 +273,7 @@
         <details class="faq"><summary>부산 지하철, 끝에서 끝까지 얼마나 걸리나요?</summary><p>중심(서면)에서 출발하면 지하철역의 14%가 15분 안에, 44%가 30분 안에 닿습니다(도보·대기 포함). 가장 먼 역인 태화강까지는 약 88분입니다.</p></details>
         <details class="faq"><summary>부산 지하철 노선은 얼마나 자주 다니나요?</summary><p>평일 낮 평균 배차 간격은 1호선 5.6분, 2호선 5.8분, 3호선 6.4분, 4호선 6.7분, 동해선 21.7분, 부산김해경전철 5.3분입니다. 가장 자주 다니는 노선은 부산김해경전철으로, 약 5.3분마다 옵니다.</p></details>
         <details class="faq"><summary>어떤 시간표를 쓰나요?</summary><p>부산 도시철도 계획 시간표(GTFS, 국가교통DB 제공 자료)를 사용합니다. 2026년 10월 6일에 받은 자료입니다. 시간표 유효 기간은 2030년 12월 31일까지입니다. 소요시간은 2026년 10월 6일 화요일 7시~20시 기준입니다.</p></details>
-        <details class="faq"><summary>부산에서 버스도 계산되나요?</summary><p>선택할 수 있습니다. 지도 아래 ‘버스’ 항목을 켜면 됩니다. 기본은 지하철만 표시합니다. 드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다.</p></details>
+        <details class="faq"><summary>부산에서 버스도 계산되나요?</summary><p>네, 기본으로 버스까지 함께 계산합니다. 지도 아래 ‘버스’ 항목을 끄면 지하철만으로 계산합니다. 드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다.</p></details>
         <details class="faq"><summary>소요시간은 어떻게 계산하나요?</summary><p>시속 4.5km로 정류장까지 걷고, 배차 간격의 절반만큼 기다리고, 시간표상 역 사이 소요시간을 더합니다. 환승할 때는 도보 1.5분을 더합니다. 지하철은 승강장까지 오가는 1분도 더합니다. 실시간 정보나 운행 장애는 반영하지 않는, ‘시간표상’ 도시입니다.</p></details>
         <details class="faq"><summary>이 부산 지도는 어디서 왔나요?</summary><p>아이디어는 Anthony Castrio의 <a href="https://castrio.me/nyc/">NYC Transit Time Cartogram</a>과, 이를 파리에 옮긴 Jules Grandin의 <a href="https://julesgrandin.github.io/paris-temps-transport/">C'est encore loin&nbsp;?</a>에서 왔습니다. 코드는 Camille Roux가 프랑스 도시용으로 만든 <a href="https://github.com/camilleroux/montpellier-temps-transport">À portée de tram</a>(MIT 라이선스)을 포크했습니다.</p></details>
       </section>
@@ -284,28 +284,28 @@
           <a class="city-card" href="../seoul/">
             <img src="../og/thumb-seoul.jpg" width="600" height="315" alt="" loading="lazy" />
             <span class="city-card-body">
-              <h3>서울 지하철 시간 지도</h3>
+              <h3>서울 대중교통 시간 지도</h3>
               <span>지하철역의 30%가 중심(시청)에서 30분 안 · 수도권 전철</span>
             </span>
           </a>
           <a class="city-card" href="../daegu/">
             <img src="../og/thumb-daegu.jpg" width="600" height="315" alt="" loading="lazy" />
             <span class="city-card-body">
-              <h3>대구 지하철 시간 지도</h3>
+              <h3>대구 대중교통 시간 지도</h3>
               <span>지하철역의 72%가 중심(반월당)에서 30분 안 · 대구 도시철도</span>
             </span>
           </a>
           <a class="city-card" href="../daejeon/">
             <img src="../og/thumb-daejeon.jpg" width="600" height="315" alt="" loading="lazy" />
             <span class="city-card-body">
-              <h3>대전 지하철 시간 지도</h3>
+              <h3>대전 대중교통 시간 지도</h3>
               <span>지하철역의 95%가 중심(중앙로)에서 30분 안 · 대전 도시철도</span>
             </span>
           </a>
           <a class="city-card" href="../gwangju/">
             <img src="../og/thumb-gwangju.jpg" width="600" height="315" alt="" loading="lazy" />
             <span class="city-card-body">
-              <h3>광주 지하철 시간 지도</h3>
+              <h3>광주 대중교통 시간 지도</h3>
               <span>지하철역의 100%가 중심(문화전당)에서 30분 안 · 광주 도시철도</span>
             </span>
           </a>
