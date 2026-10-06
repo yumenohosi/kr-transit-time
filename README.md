@@ -32,6 +32,8 @@ python3 tools/render_og.py busan && python3 tools/render_og.py home       # 미�
 python3 build_pages.py                                                    # 이미지 버전 반영
 ```
 
+배포는 `npx wrangler deploy`(Cloudflare Workers 정적 에셋, `wrangler.jsonc`, https://transit.yumes.net).
+
 원본 데이터(`data/`)는 저장소에 넣지 않고, 출처 URL·날짜·SHA-256은 `sources/<도시>.json`에 남는다. Overpass가 504를 내면
 `fetch_data.py`가 다른 서버로 재시도한다.
 
