@@ -1,0 +1,117 @@
+{
+  "city": "대구",
+  "builtAt": "2026-10-06T09:20:02+00:00",
+  "referenceDate": "2026-10-06",
+  "serviceWindow": "7h–20h",
+  "gtfs": {
+    "network": "대구 도시철도",
+    "dataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "source": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "how": "manual",
+    "fetchedAt": "2026-10-06T09:18:51+00:00",
+    "bytes": 8460996,
+    "sha256": "c543a356f098c8e818f294b5b02f8f2b83a80087c7d071363c0904addbdd6f47",
+    "feedInfo": null,
+    "servicePeriod": [
+      "2017-01-01",
+      "2030-12-31"
+    ]
+  },
+  "communes": {
+    "metropole": "대구광역시",
+    "boundaries": {
+      "area": "KR-27",
+      "adminLevel": "6"
+    },
+    "source": "Overpass API: [out:json][timeout:180];area[\"ISO3166-2\"=\"KR-27\"]->.a;relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"6\"](area.a);out geom;",
+    "how": "download",
+    "fetchedAt": "2026-10-06T08:51:18+00:00",
+    "bytes": 101021,
+    "sha256": "1c6c993dee7e69e6f8c7ad0eb671be6a27605eefe5d901cc179bafd662519d6b"
+  },
+  "openStreetMap": {
+    "licence": "ODbL, © contributeurs OpenStreetMap",
+    "osm_rail": {
+      "source": "Overpass API: [out:json][timeout:110];relation[\"route\"~\"^(subway|light_rail|train|monorail)$\"](35.64,128.27,36.08,128.91);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T08:55:50+00:00",
+      "bytes": 1720679,
+      "sha256": "8d5bf38e08a5187058ec646fa4531628e9d0e4d0d1c2b4fd24849a0529820119"
+    },
+    "osm_water_parks": {
+      "source": "Overpass API: [out:json][timeout:180];(relation[\"natural\"=\"water\"](35.64,128.27,36.08,128.91);way[\"natural\"=\"water\"](35.64,128.27,36.08,128.91);relation[\"leisure\"=\"park\"](35.8,128.51,35.92,128.67);way[\"leisure\"=\"park\"](35.8,128.51,35.92,128.67););out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T08:56:00+00:00",
+      "bytes": 3078505,
+      "sha256": "e124f8e72b1444eff054b063c7757801580625df13c31a6c51112d44f2fa781b"
+    },
+    "osm_rivers": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"waterway\"=\"river\"][\"name\"~\"^(금호강|낙동강)( - .*)?$\"][\"tunnel\"!~\".\"](35.64,128.27,36.08,128.91);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:01:05+00:00",
+      "bytes": 59691,
+      "sha256": "569c5eed86f9e0560669367d645231c5e47897233f46a711973ff55aea50b6e4"
+    },
+    "osm_bridges": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"bridge\"][\"highway\"][\"highway\"!~\"^(motorway|motorway_link|trunk|trunk_link|construction|proposed)$\"][\"foot\"!=\"no\"](35.64,128.27,36.08,128.91);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:02:52+00:00",
+      "bytes": 1247812,
+      "sha256": "41d5bf1ddd2f724e86631bc1f10b5f0c28001dced85510f720c2e705902d2222"
+    }
+  },
+  "railGeometry": "OpenStreetMap",
+  "excludedRoutes": [],
+  "network": {
+    "lines": {
+      "metro": 4,
+      "bus": 321
+    },
+    "stops": 3834,
+    "railStations": 96
+  },
+  "stats": {
+    "lines": [
+      {
+        "name": "1호선",
+        "mode": "metro",
+        "color": "#D93F5C",
+        "stations": 35,
+        "headway": 6.9
+      },
+      {
+        "name": "2호선",
+        "mode": "metro",
+        "color": "#00AA80",
+        "stations": 29,
+        "headway": 6.8
+      },
+      {
+        "name": "3호선",
+        "mode": "metro",
+        "color": "#FFB100",
+        "stations": 30,
+        "headway": 6.4
+      },
+      {
+        "name": "대경선",
+        "mode": "metro",
+        "color": "#003DA5",
+        "stations": 7,
+        "headway": 24.0
+      }
+    ],
+    "railStations": 96,
+    "busLines": 321,
+    "center": "반월당",
+    "within15": 19,
+    "within30": 72,
+    "farthestStation": "구미",
+    "farthestMinutes": 65,
+    "ogTrip": {
+      "name": "이곡",
+      "lat": 35.85059,
+      "lon": 128.51619
+    }
+  }
+}

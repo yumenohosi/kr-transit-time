@@ -1,0 +1,96 @@
+{
+  "city": "광주",
+  "builtAt": "2026-10-06T09:20:48+00:00",
+  "referenceDate": "2026-10-06",
+  "serviceWindow": "7h–20h",
+  "gtfs": {
+    "network": "광주 도시철도",
+    "dataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "source": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "how": "manual",
+    "fetchedAt": "2026-10-06T09:20:39+00:00",
+    "bytes": 4464867,
+    "sha256": "b7c7685bd473b27de6f10e4b447b7269c1bab87a995a6e2db9e484cb53b37aff",
+    "feedInfo": null,
+    "servicePeriod": [
+      "2017-01-01",
+      "2030-12-31"
+    ]
+  },
+  "communes": {
+    "metropole": "광주광역시",
+    "boundaries": {
+      "area": "KR-29",
+      "adminLevel": "6"
+    },
+    "source": "Overpass API: [out:json][timeout:180];area[\"ISO3166-2\"=\"KR-29\"]->.a;relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"6\"](area.a);out geom;",
+    "how": "download",
+    "fetchedAt": "2026-10-06T09:14:13+00:00",
+    "bytes": 90402,
+    "sha256": "2fea890b20576d4563c2830e629eab379ecf4b874cf70c623d668c48bc3ad659"
+  },
+  "openStreetMap": {
+    "licence": "ODbL, © contributeurs OpenStreetMap",
+    "osm_rail": {
+      "source": "Overpass API: [out:json][timeout:110];relation[\"route\"~\"^(subway)$\"](34.93,126.6,35.37,127.24);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:14:22+00:00",
+      "bytes": 28863,
+      "sha256": "7ecd1833ad0f661ad3ad537612bf83a18139a5f5b6111709a0ecb1823a261c84"
+    },
+    "osm_water_parks": {
+      "source": "Overpass API: [out:json][timeout:180];(relation[\"natural\"=\"water\"](34.93,126.6,35.37,127.24);way[\"natural\"=\"water\"](34.93,126.6,35.37,127.24);relation[\"leisure\"=\"park\"](35.09,126.84,35.21,127.0);way[\"leisure\"=\"park\"](35.09,126.84,35.21,127.0););out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:18:28+00:00",
+      "bytes": 3926894,
+      "sha256": "930d486a4ad4ad5da368b91a8385bf97985b8bf5ae688ec4391c2e9fcfe187c8"
+    },
+    "osm_rivers": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"waterway\"=\"river\"][\"name\"~\"^(영산강)( - .*)?$\"][\"tunnel\"!~\".\"](34.93,126.6,35.37,127.24);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:18:30+00:00",
+      "bytes": 49941,
+      "sha256": "0949807ace8c25e236488e80b14d5adc409714c1abeefc12305ce9970ead00a2"
+    },
+    "osm_bridges": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"bridge\"][\"highway\"][\"highway\"!~\"^(motorway|motorway_link|trunk|trunk_link|construction|proposed)$\"][\"foot\"!=\"no\"](34.93,126.6,35.37,127.24);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:18:34+00:00",
+      "bytes": 1639957,
+      "sha256": "4f550c49ef4ac13a33ebeb62ab4e8ecb03ca0159ef3a5865c29b49de3c380323"
+    }
+  },
+  "railGeometry": "OpenStreetMap",
+  "excludedRoutes": [],
+  "network": {
+    "lines": {
+      "metro": 1,
+      "bus": 320
+    },
+    "stops": 1372,
+    "railStations": 20
+  },
+  "stats": {
+    "lines": [
+      {
+        "name": "1호선",
+        "mode": "metro",
+        "color": "#009088",
+        "stations": 20,
+        "headway": 8.5
+      }
+    ],
+    "railStations": 20,
+    "busLines": 320,
+    "center": "문화전당",
+    "within15": 55,
+    "within30": 100,
+    "farthestStation": "평동",
+    "farthestMinutes": 26,
+    "ogTrip": {
+      "name": "공항",
+      "lat": 35.14276,
+      "lon": 126.81127
+    }
+  }
+}

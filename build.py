@@ -28,8 +28,8 @@ def control_row(slug: str) -> str:
     size = (ROOT / "site" / "data" / f"{slug}.json").stat().st_size / 1e6
     lines = " ".join(f"{line['name']}:{line['headway']:g}" for line in stats["lines"])
     return (
-        f"{slug:16s} {sources['referenceDate']} | {size:4.1f} Mo | {stats['railStations']:3d} stations | "
-        f"30 min : {stats['within30']:3d} % | plus loin : {stats['farthestStation'][:24]} {stats['farthestMinutes']} min | {lines}"
+        f"{slug:16s} {sources['referenceDate']} | {size:4.1f} MB | 역 {stats['railStations']:3d}개 | "
+        f"30분 안 {stats['within30']:3d}% | 최장 {stats['farthestStation'][:24]} {stats['farthestMinutes']}분 | {lines}"
     )
 
 
@@ -40,10 +40,9 @@ def main() -> None:
         if "--fetch" in flags:
             run("fetch_data.py", slug)
         run("build_data.py", slug)
-    run("tools/rankings.py")
     run("build_pages.py")
     if "--no-og" not in flags:
-        for slug in [*slugs, "home", "classements"]:
+        for slug in [*slugs, "home"]:
             run("tools/render_og.py", slug)
         run("build_pages.py")  # pages reference the fingerprint of the new images
     print()

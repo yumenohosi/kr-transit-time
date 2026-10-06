@@ -1,6 +1,6 @@
 """City configurations (cities/<slug>.json), completed with defaults shared by every script.
 
-A config only needs what cannot be deduced: name, network, sources (GTFS, EPCI), centre of the map and the
+A config only needs what cannot be deduced: name, network, sources (GTFS, OSM boundaries), centre of the map and the
 `kind` of rail network ("tram", "metro" or "metro+tram"). Everything else (titles, labels, OSM areas…) has a
 default below and can be overridden in the JSON when a city needs it.
 """
@@ -13,16 +13,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 CITIES_DIR = ROOT / "cities"
 
-RAIL_NOUN = {"tram": "tram", "metro": "métro", "metro+tram": "métro et tram"}
-RAIL_LABEL = {"tram": "Tram", "metro": "Métro", "metro+tram": "Métro et tram"}
-RAIL_STATIONS = {"tram": "stations de tram", "metro": "stations de métro", "metro+tram": "stations de métro et de tram"}
+RAIL_NOUN = {"tram": "트램", "metro": "지하철", "metro+tram": "지하철·트램"}
+RAIL_LABEL = {"tram": "트램", "metro": "지하철", "metro+tram": "지하철·트램"}
+RAIL_STATIONS = {"tram": "트램 정류장", "metro": "지하철역", "metro+tram": "지하철역·트램 정류장"}
 # Half-sizes (degrees of latitude, longitude) of the OSM areas around the centre.
 OSM_HALF_SIZE = (0.22, 0.32)
 PARKS_HALF_SIZE = (0.06, 0.08)
-
-
-def lowercase_first(text: str) -> str:
-    return text[:1].lower() + text[1:] if text.startswith(("Place", "Hôtel")) else text
 
 
 def with_defaults(raw: dict) -> dict:
@@ -33,11 +29,11 @@ def with_defaults(raw: dict) -> dict:
     city.setdefault("railNoun", RAIL_NOUN[kind])
     city.setdefault("railLabel", RAIL_LABEL[kind])
     city.setdefault("railStations", RAIL_STATIONS[kind])
-    city.setdefault("title", f"{city['name']} à portée de {'tram' if kind == 'tram' else 'métro'}")
-    city.setdefault("titleSuffix", f"Temps de trajet en {city['railNoun']} {city['network']}")
-    city.setdefault("busNoun", "bus")
-    city.setdefault("busLabel", "Bus")
-    city.setdefault("area", "de la Métropole" if "métropole" in city["metropole"].lower() else "de l'agglomération")
+    city.setdefault("title", f"{city['name']} {city['railNoun']} 시간 지도")
+    city.setdefault("titleSuffix", f"{city['railNoun']} 소요시간 · {city['network']}")
+    city.setdefault("busNoun", "버스")
+    city.setdefault("busLabel", "버스")
+    city.setdefault("area", city["metropole"])
     city.setdefault("railGeometry", "gtfs")
     city.setdefault("lat0", round(lat, 2))
     city.setdefault("osmBbox", [round(lat - OSM_HALF_SIZE[0], 2), round(lon - OSM_HALF_SIZE[1], 2),
@@ -47,8 +43,8 @@ def with_defaults(raw: dict) -> dict:
     city.setdefault("osmRailBbox", city["osmBbox"])
     city.setdefault(
         "ogAlt",
-        f"Carte de {city['name']} colorée selon le temps de trajet en {city['railNoun']} depuis "
-        f"{lowercase_first(city['defaultFrom']['label'])}, avec les isochrones 15 et 30 minutes.",
+        f"{city['defaultFrom']['label']}에서 출발하는 {city['railNoun']} 소요시간으로 색칠한 {city['name']} 지도, "
+        "15분·30분 등시선 포함.",
     )
     return city
 

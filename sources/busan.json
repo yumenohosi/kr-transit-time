@@ -1,0 +1,131 @@
+{
+  "city": "부산",
+  "builtAt": "2026-10-06T09:16:06+00:00",
+  "referenceDate": "2026-10-06",
+  "serviceWindow": "7h–20h",
+  "gtfs": {
+    "network": "부산 도시철도",
+    "dataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "source": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "how": "manual",
+    "fetchedAt": "2026-10-06T08:55:06+00:00",
+    "bytes": 14061447,
+    "sha256": "2ec8e4433c96cff48527f01bd705b6f216d02e69893c415ddbc7777306703057",
+    "feedInfo": null,
+    "servicePeriod": [
+      "2017-01-01",
+      "2030-12-31"
+    ]
+  },
+  "communes": {
+    "metropole": "부산광역시",
+    "boundaries": {
+      "area": "KR-26",
+      "adminLevel": "6"
+    },
+    "source": "Overpass API: [out:json][timeout:180];area[\"ISO3166-2\"=\"KR-26\"]->.a;relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"6\"](area.a);out geom;",
+    "how": "download",
+    "fetchedAt": "2026-10-06T08:45:27+00:00",
+    "bytes": 93647,
+    "sha256": "c2d18fdf1b197b6302b4a1c14804ce213606cec5237608fc30ff8368968ad91a"
+  },
+  "openStreetMap": {
+    "licence": "ODbL, © contributeurs OpenStreetMap",
+    "osm_rail": {
+      "source": "Overpass API: [out:json][timeout:110];relation[\"route\"~\"^(subway|light_rail|train|monorail)$\"](34.94,128.74,35.38,129.38);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T08:45:45+00:00",
+      "bytes": 2107188,
+      "sha256": "8b59d89b9d84391687e05caf1274d6f199b9910a77223f0a8b24cb873e570e93"
+    },
+    "osm_water_parks": {
+      "source": "Overpass API: [out:json][timeout:180];(relation[\"natural\"=\"water\"](34.94,128.74,35.38,129.38);way[\"natural\"=\"water\"](34.94,128.74,35.38,129.38);relation[\"leisure\"=\"park\"](35.1,128.98,35.22,129.14);way[\"leisure\"=\"park\"](35.1,128.98,35.22,129.14););out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T08:49:20+00:00",
+      "bytes": 2219706,
+      "sha256": "8c6b22178561eb4fdae0d755008d365bb7dd26deb4aead0b9de8a717ac9927b7"
+    },
+    "osm_rivers": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"waterway\"=\"river\"][\"name\"~\"^(낙동강|서낙동강)( - .*)?$\"][\"tunnel\"!~\".\"](34.94,128.74,35.38,129.38);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T08:49:24+00:00",
+      "bytes": 19636,
+      "sha256": "c4dc8c4f3483a243bfc6ceae30a65d6b58ec986f8acb95289ed318f0f76fec99"
+    },
+    "osm_bridges": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"bridge\"][\"highway\"][\"highway\"!~\"^(motorway|motorway_link|trunk|trunk_link|construction|proposed)$\"][\"foot\"!=\"no\"](34.94,128.74,35.38,129.38);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T08:49:50+00:00",
+      "bytes": 1296134,
+      "sha256": "11efb8d21e24e24e41b4f123bb8f3bad678a1781009ace685ac91fd7ab73414c"
+    }
+  },
+  "railGeometry": "OpenStreetMap",
+  "excludedRoutes": [],
+  "network": {
+    "lines": {
+      "metro": 6,
+      "bus": 352
+    },
+    "stops": 4101,
+    "railStations": 147
+  },
+  "stats": {
+    "lines": [
+      {
+        "name": "1호선",
+        "mode": "metro",
+        "color": "#F06A00",
+        "stations": 40,
+        "headway": 5.6
+      },
+      {
+        "name": "2호선",
+        "mode": "metro",
+        "color": "#81BF48",
+        "stations": 43,
+        "headway": 5.8
+      },
+      {
+        "name": "3호선",
+        "mode": "metro",
+        "color": "#BB8C00",
+        "stations": 17,
+        "headway": 6.4
+      },
+      {
+        "name": "4호선",
+        "mode": "metro",
+        "color": "#217DCB",
+        "stations": 14,
+        "headway": 6.7
+      },
+      {
+        "name": "동해선",
+        "mode": "metro",
+        "color": "#003DA5",
+        "stations": 23,
+        "headway": 21.7
+      },
+      {
+        "name": "부산김해경전철",
+        "mode": "metro",
+        "color": "#8652A1",
+        "stations": 21,
+        "headway": 5.3
+      }
+    ],
+    "railStations": 147,
+    "busLines": 352,
+    "center": "서면",
+    "within15": 14,
+    "within30": 44,
+    "farthestStation": "태화강",
+    "farthestMinutes": 88,
+    "ogTrip": {
+      "name": "남포",
+      "lat": 35.09792,
+      "lon": 129.0348
+    }
+  }
+}

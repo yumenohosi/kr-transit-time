@@ -1,0 +1,101 @@
+{
+  "city": "대전",
+  "builtAt": "2026-10-06T09:20:25+00:00",
+  "referenceDate": "2026-10-06",
+  "serviceWindow": "7h–20h",
+  "gtfs": {
+    "network": "대전 도시철도",
+    "dataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "source": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+    "how": "manual",
+    "fetchedAt": "2026-10-06T09:20:17+00:00",
+    "bytes": 4318062,
+    "sha256": "ced8b16cdd8c13e6543a7535c92bb57aece39007dc39f245b03aab422f7d12b6",
+    "feedInfo": null,
+    "servicePeriod": [
+      "2017-01-01",
+      "2030-12-31"
+    ]
+  },
+  "communes": {
+    "metropole": "대전광역시",
+    "boundaries": {
+      "ids": [
+        3888601,
+        3889016,
+        3889109,
+        3890427,
+        3890428
+      ]
+    },
+    "source": "Overpass API: [out:json][timeout:180];relation(id:3888601,3889016,3889109,3890427,3890428);out geom;",
+    "how": "download",
+    "fetchedAt": "2026-10-06T09:07:30+00:00",
+    "bytes": 89772,
+    "sha256": "1367ec8c25152692c244a1fb57b3d8e25a9ccaeb6eeba3ec9481231f8482fc85"
+  },
+  "openStreetMap": {
+    "licence": "ODbL, © contributeurs OpenStreetMap",
+    "osm_rail": {
+      "source": "Overpass API: [out:json][timeout:110];relation[\"route\"~\"^(subway)$\"](36.11,127.11,36.55,127.75);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:07:33+00:00",
+      "bytes": 26746,
+      "sha256": "de333ea7c9cddc26bc520b9941f4558c787757e920d9956015c61074a041852a"
+    },
+    "osm_water_parks": {
+      "source": "Overpass API: [out:json][timeout:180];(relation[\"natural\"=\"water\"](36.11,127.11,36.55,127.75);way[\"natural\"=\"water\"](36.11,127.11,36.55,127.75);relation[\"leisure\"=\"park\"](36.27,127.35,36.39,127.51);way[\"leisure\"=\"park\"](36.27,127.35,36.39,127.51););out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:09:45+00:00",
+      "bytes": 2752364,
+      "sha256": "7f4c3fca9249970788acba518598b53a50dce4bb8e2ef3bef6f68a1b18ea59be"
+    },
+    "osm_rivers": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"waterway\"=\"river\"][\"name\"~\"^(갑천)( - .*)?$\"][\"tunnel\"!~\".\"](36.11,127.11,36.55,127.75);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:09:48+00:00",
+      "bytes": 27410,
+      "sha256": "5da97df7adb0035bbcdb38f3ab67ec5fc2bf1d1f4bc388a339bbca70b37fa232"
+    },
+    "osm_bridges": {
+      "source": "Overpass API: [out:json][timeout:110];way[\"bridge\"][\"highway\"][\"highway\"!~\"^(motorway|motorway_link|trunk|trunk_link|construction|proposed)$\"][\"foot\"!=\"no\"](36.11,127.11,36.55,127.75);out geom;",
+      "how": "download",
+      "fetchedAt": "2026-10-06T09:09:53+00:00",
+      "bytes": 1942138,
+      "sha256": "98f3b5cee9dd969c6b03252523bc0396993a121674a891368100592ffccc3181"
+    }
+  },
+  "railGeometry": "OpenStreetMap",
+  "excludedRoutes": [],
+  "network": {
+    "lines": {
+      "metro": 1,
+      "bus": 148
+    },
+    "stops": 1513,
+    "railStations": 22
+  },
+  "stats": {
+    "lines": [
+      {
+        "name": "1호선",
+        "mode": "metro",
+        "color": "#007448",
+        "stations": 22,
+        "headway": 8.6
+      }
+    ],
+    "railStations": 22,
+    "busLines": 148,
+    "center": "중앙로",
+    "within15": 45,
+    "within30": 95,
+    "farthestStation": "반석",
+    "farthestMinutes": 30,
+    "ogTrip": {
+      "name": "갑천",
+      "lat": 36.35469,
+      "lon": 127.35464
+    }
+  }
+}

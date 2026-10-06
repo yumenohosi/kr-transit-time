@@ -2,8 +2,8 @@
 """Render social previews with headless Chrome: site/og/<city>.jpg (1200×630), its thumbnail og/thumb-<city>.jpg
 for the home page cards, and og/home.jpg for the home page.
 
-Usage: python3 tools/render_og.py <city>|home|classements|all   (run build_pages.py before, and again after for "home")
-Needs Google Chrome and ImageMagick (`magick`).
+Usage: python3 tools/render_og.py <city>|home|all   (run build_pages.py before, and again after for "home")
+Needs Google Chrome; JPEG conversion uses macOS `sips`.
 """
 
 from __future__ import annotations
@@ -40,10 +40,10 @@ OVERLAY = """<style>
 </head>"""
 
 
-HOME = """<!doctype html><html lang="fr"><head><meta charset="utf-8" />
+HOME = """<!doctype html><html lang="ko"><head><meta charset="utf-8" />
 <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:500,800" />
 <style>
-  body { width: 1200px; height: 630px; margin: 0; overflow: hidden; font-family: Inter, sans-serif; background: #fff; }
+  body { width: 1200px; height: 630px; margin: 0; overflow: hidden; font-family: Inter, "Apple SD Gothic Neo", sans-serif; background: #fff; }
   header { position: absolute; top: 34px; left: 44px; right: 44px; }
   h1 { margin: 0; font-size: 60px; font-weight: 800; letter-spacing: -0.035em; color: #111; }
   p { margin: 6px 0 0; font-size: 24px; font-weight: 500; color: #4b4b4b; }
@@ -52,7 +52,7 @@ HOME = """<!doctype html><html lang="fr"><head><meta charset="utf-8" />
   img { display: block; width: 100%; height: 190px; object-fit: cover; object-position: center 70%; }
   figcaption { position: absolute; left: 10px; bottom: 10px; padding: 4px 10px; border-radius: 8px; background: #fff; font-weight: 800; font-size: 20px; }
 </style></head><body>
-<header><h1>À portée de tram</h1><p>Les grandes villes redessinées par le temps de trajet en tram et en métro</p></header>
+<header><h1>대중교통 시간 지도</h1><p>지하철 소요시간으로 다시 그린 도시</p></header>
 <div class="grid">FIGURES</div></body></html>"""
 
 
@@ -65,7 +65,7 @@ def screenshot(url: str, out: Path) -> None:
             check=True, capture_output=True,
         )
         out.parent.mkdir(exist_ok=True)
-        subprocess.run(["magick", str(png), "-strip", "-quality", "88", str(out)], check=True)
+        subprocess.run(["sips", "-s", "format", "jpeg", "-s", "formatOptions", "88", str(png), "--out", str(out)], check=True, capture_output=True)
     print(f"Wrote {out.relative_to(ROOT)}")
 
 
@@ -96,63 +96,22 @@ def render_home(cities: list[dict]) -> None:
         preview.unlink()
 
 
-RANKINGS_OVERLAY = """<style>
-  html, body { width: 1200px; height: 630px; overflow: hidden; margin: 0; }
-  .topbar, .breadcrumb, .section, .site-footer, .lede, .ranking-cards { display: none !important; }
-  .podium { width: 100%; margin-top: 34px; }
-  .podium-step strong { font-size: 2.6rem; }
-  .podium-step span:not(.medal) { font-size: 1.15rem; }
-  .page { max-width: 1120px; padding: 34px 40px 0; }
-  .hero { padding: 0; }
-  .hero h1 { font-size: 64px; margin: 18px 0 8px; }
-  .ranking-highlights { margin-top: 30px; gap: 16px; }
-  .ranking-highlights .stat { padding: 22px; }
-  .ranking-highlights strong { font-size: 2.6rem; }
-  .ranking-highlights span { font-size: 1.05rem; }
-  body::after { content: "À portée de tram · tram.camilleroux.com · d'après les horaires officiels des réseaux";
-    position: absolute; left: 0; right: 0; bottom: 44px; text-align: center; color: #3aa70b; font: 600 20px Inter, sans-serif; }
-</style>
-</head>"""
-
-
-def render_rankings() -> None:
-    """The rankings hub (og/classements.jpg) and every ranking page (og/classement-<slug>.jpg)."""
-    pages = [(SITE / "classements", "classements.jpg")] + [
-        (path.parent, f"classement-{path.parent.name}.jpg") for path in sorted((SITE / "classements").glob("*/index.html"))
-    ]
-    server = serve()
-    try:
-        for folder, image in pages:
-            page = (folder / "index.html").read_text(encoding="utf-8").replace("</head>", RANKINGS_OVERLAY, 1)
-            preview = folder / "_og.html"
-            preview.write_text(page, encoding="utf-8")
-            try:
-                relative = folder.relative_to(SITE).as_posix()
-                screenshot(f"http://127.0.0.1:{server.server_port}/{relative}/_og.html", SITE / "og" / image)
-            finally:
-                preview.unlink()
-    finally:
-        server.shutdown()
-
-
 def main() -> None:
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     cities = load_cities()
-    targets = [c["slug"] for c in cities] + ["home", "classements"] if sys.argv[1] == "all" else [sys.argv[1]]
+    targets = [c["slug"] for c in cities] + ["home"] if sys.argv[1] == "all" else [sys.argv[1]]
     for target in targets:
         if target == "home":
             render_home(cities)
-        elif target == "classements":
-            render_rankings()
         else:
             render_city(next(city for city in cities if city["slug"] == target))
 
 
 def render_city(city: dict) -> None:
     page = (SITE / city["path"] / "index.html").read_text(encoding="utf-8")
-    title = f'<div class="og-title"><h1>{city["title"]}</h1><p>La ville redessinée par le temps de trajet, depuis où vous voulez</p></div>'
-    credit = '<div class="og-credit">© contributeurs OpenStreetMap · horaires ' + city["network"] + '</div>'
+    title = f'<div class="og-title"><h1>{city["title"]}</h1><p>어디서 출발하든, 소요시간으로 다시 그린 도시</p></div>'
+    credit = '<div class="og-credit">© OpenStreetMap 기여자 · 시간표 ' + city["network"] + '</div>'
     page = page.replace("</head>", OVERLAY, 1).replace('<canvas id="mapCanvas"></canvas>', '<canvas id="mapCanvas"></canvas>\n' + title + credit, 1)
     preview = SITE / city["path"] / "_og.html"
     preview.write_text(page, encoding="utf-8")
@@ -165,7 +124,7 @@ def render_city(city: dict) -> None:
         out = SITE / "og" / f"{city['slug']}.jpg"
         screenshot(f"http://127.0.0.1:{server.server_port}/{city['path']}_og.html?to={trip['lat']},{trip['lon']}", out)
         thumb = SITE / "og" / f"thumb-{city['slug']}.jpg"
-        subprocess.run(["magick", str(out), "-resize", "600x315", "-strip", "-quality", "82", str(thumb)], check=True)
+        subprocess.run(["sips", "-z", "315", "600", "-s", "formatOptions", "82", str(out), "--out", str(thumb)], check=True, capture_output=True)
         print(f"Wrote {thumb.relative_to(ROOT)}")
     finally:
         server.shutdown()

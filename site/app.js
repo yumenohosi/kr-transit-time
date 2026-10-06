@@ -4,17 +4,17 @@
 
 const CITY = JSON.parse(document.getElementById("city-config").textContent);
 const DATA_URL = new URL(`./data/${CITY.slug}.json?v=${CITY.dataVersion}`, import.meta.url);
-const GEOCODER_URL = "https://api-adresse.data.gouv.fr/search/";
+const GEOCODER_URL = CITY.geocoderUrl;
 
 const DEFAULT_FROM = CITY.defaultFrom;
 const MODE_LABELS = {
-  tram: "Tram",
-  metro: "Métro",
-  funicular: "Funiculaire",
-  cable: "Téléphérique",
-  ferry: "Bateau",
-  busway: "Busway",
-  bus: "Bus",
+  tram: "트램",
+  metro: "지하철",
+  funicular: "푸니쿨라",
+  cable: "케이블카",
+  ferry: "배",
+  busway: "BRT",
+  bus: "버스",
 };
 const DEFAULT_MAX = 45;
 const ISOCHRONE_OPTIONS = [15, 30, 45, 60];
@@ -27,6 +27,7 @@ const MIN_ZOOM_FACTOR = 0.5;
 const MAX_ZOOM_FACTOR = 14;
 const STOP_LABEL_SCALE = 0.13; // pixels par mètre au-delà desquels on nomme les arrêts
 const RAIL_NAME_RADIUS = 400; // mètres
+const MIN_QUERY_LENGTH = 2; // « 강남 », « 서면 » : deux syllabes suffisent en coréen
 
 // Du plus proche (vert) au plus lointain (rouge) ; au-delà du max : gris.
 const PALETTE = [
@@ -89,11 +90,11 @@ const hypot = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
 function formatMinutes(minutes) {
   if (!Number.isFinite(minutes)) return "—";
-  if (minutes < 1) return "< 1 min";
-  if (minutes < 60) return `${Math.round(minutes)} min`;
+  if (minutes < 1) return "1분 미만";
+  if (minutes < 60) return `${Math.round(minutes)}분`;
   const hours = Math.floor(minutes / 60);
   const rest = Math.round(minutes - hours * 60);
-  return `${hours} h ${String(rest).padStart(2, "0")}`;
+  return rest ? `${hours}시간 ${rest}분` : `${hours}시간`;
 }
 
 function paletteColor(t) {
@@ -197,7 +198,7 @@ function walkMeters(a, b) {
 }
 
 function isOnLand(point) {
-  if (app.data.water.some((polygon) => pointInPolygon(point, polygon))) return false;
+  if ([...app.data.water, ...(app.data.coastSea ?? [])].some((polygon) => pointInPolygon(point, polygon))) return false;
   return app.data.boroughs.some((commune) => commune.polygons.some((polygon) => pointInPolygon(point, polygon)));
 }
 
@@ -257,32 +258,79 @@ class MinHeap {
   }
 }
 
+/** Arrêts à moins de `transferRadius` à pied (pont compris) de chaque arrêt, lui-même inclus, avec la marche de correspondance. */
+function nearbyStations(data) {
+  const { transferRadius: radius, transferWalk } = data.meta;
+  const cells = new Map();
+  const cellOf = (point) => [Math.floor(point[0] / radius), Math.floor(point[1] / radius)];
+  data.stations.forEach((station, index) => {
+    const key = cellOf(station.point).join();
+    if (!cells.has(key)) cells.set(key, []);
+    cells.get(key).push(index);
+  });
+  return data.stations.map((station, i) => {
+    const [cx, cy] = cellOf(station.point);
+    const found = [[i, transferWalk]];
+    for (let gx = cx - 1; gx <= cx + 1; gx += 1) {
+      for (let gy = cy - 1; gy <= cy + 1; gy += 1) {
+        for (const j of cells.get(`${gx},${gy}`) ?? []) {
+          const other = data.stations[j].point;
+          if (j === i || hypot(station.point, other) > radius) continue;
+          const meters = walkMeters(station.point, other);
+          if (meters <= radius) found.push([j, walkMinutes(meters) + transferWalk]);
+        }
+      }
+    }
+    return found;
+  });
+}
+
 function prepareGraph(data) {
   const count = data.routeStates.length;
+  const station = Int32Array.from(data.routeStates, (state) => state.stationIndex);
+  const wait = Float32Array.from(data.routeStates, (state) => state.wait);
+  // Accès au quai (escaliers, couloirs du métro), compté à l'entrée comme à la sortie.
+  const access = Float32Array.from(data.routeStates, (state) => state.access);
+  const route = data.routeStates.map((state) => state.routeId);
+  const isBus = Uint8Array.from(data.routeStates, (state) => (data.routeInfo[state.routeId]?.rail ? 0 : 1));
+
+  // Le fichier ne garde que les trajets et les correspondances entre tram/métro : celles qui touchent un bus (98 % des
+  // arcs à Séoul) se recalculent ici, avec les mêmes règles que build_graph() dans build_data.py.
+  const nearby = data.meta.transferRadius ? nearbyStations(data) : null;
+  const eachTransfer = (src, visit) => {
+    if (!nearby) return;
+    const i = station[src];
+    for (const [j, walk] of nearby[i]) {
+      for (const dst of data.stationStates[j]) {
+        if (dst === src || (!isBus[src] && !isBus[dst]) || (j !== i && route[dst] === route[src])) continue;
+        visit(dst, walk + (access[src] + access[dst]) / 2 + wait[dst]);
+      }
+    }
+  };
   const offsets = new Int32Array(count + 1);
-  data.adjacency.forEach((edges, i) => {
-    offsets[i + 1] = offsets[i] + edges.length;
-  });
+  for (let state = 0; state < count; state += 1) {
+    let edges = data.adjacency[state].length;
+    eachTransfer(state, () => {
+      edges += 1;
+    });
+    offsets[state + 1] = offsets[state] + edges;
+  }
   const targets = new Int32Array(offsets[count]);
   const weights = new Float32Array(offsets[count]);
-  data.adjacency.forEach((edges, i) => {
-    edges.forEach(([target, weight], k) => {
-      targets[offsets[i] + k] = target;
-      weights[offsets[i] + k] = weight;
+  for (let state = 0; state < count; state += 1) {
+    let k = offsets[state];
+    for (const [target, weight] of data.adjacency[state]) {
+      targets[k] = target;
+      weights[k] = weight;
+      k += 1;
+    }
+    eachTransfer(state, (target, weight) => {
+      targets[k] = target;
+      weights[k] = weight;
+      k += 1;
     });
-  });
-  return {
-    count,
-    offsets,
-    targets,
-    weights,
-    station: Int32Array.from(data.routeStates, (state) => state.stationIndex),
-    wait: Float32Array.from(data.routeStates, (state) => state.wait),
-    // Accès au quai (escaliers, couloirs du métro), compté à l'entrée comme à la sortie.
-    access: Float32Array.from(data.routeStates, (state) => state.access),
-    route: data.routeStates.map((state) => state.routeId),
-    isBus: Uint8Array.from(data.routeStates, (state) => (data.routeInfo[state.routeId]?.rail ? 0 : 1)),
-  };
+  }
+  return { count, offsets, targets, weights, station, wait, access, route, isBus };
 }
 
 function walkMinutes(meters) {
@@ -370,7 +418,7 @@ function travelTo(solution, point) {
 
 function routeLabel(routeId) {
   const info = app.data.routeInfo[routeId];
-  return `${MODE_LABELS[info.mode] ?? "Ligne"} ${info.name}`;
+  return `${MODE_LABELS[info.mode] ?? "노선"} ${info.name}`;
 }
 
 /** Reconstitue l'itinéraire (marche, lignes, correspondances) vers un point. */
@@ -378,7 +426,7 @@ function buildItinerary(solution, point) {
   const { graph, data } = app;
   const result = travelTo(solution, point);
   if (result.station === -1) {
-    return { minutes: result.minutes, steps: [{ kind: "walk", text: "Tout à pied", minutes: result.minutes }] };
+    return { minutes: result.minutes, steps: [{ kind: "walk", text: "전부 도보", minutes: result.minutes }] };
   }
 
   const chain = [];
@@ -386,7 +434,7 @@ function buildItinerary(solution, point) {
   chain.reverse();
 
   const name = (state) => data.stations[graph.station[state]].name;
-  const steps = [{ kind: "walk", text: `À pied jusqu'à ${name(chain[0])}`, minutes: solution.seedWalk[chain[0]] }];
+  const steps = [{ kind: "walk", text: `${name(chain[0])}까지 도보`, minutes: solution.seedWalk[chain[0]] }];
   let legStart = chain[0];
   const closeLeg = (legEnd) => {
     steps.push({
@@ -404,14 +452,14 @@ function buildItinerary(solution, point) {
     closeLeg(from);
     if (graph.station[from] !== graph.station[to]) {
       const meters = walkMeters(data.stations[graph.station[from]].point, data.stations[graph.station[to]].point);
-      steps.push({ kind: "walk", text: `Correspondance à pied vers ${name(to)}`, minutes: walkMinutes(meters) });
+      steps.push({ kind: "walk", text: `${name(to)}까지 걸어서 환승`, minutes: walkMinutes(meters) });
     }
     legStart = to;
   }
   closeLeg(chain[chain.length - 1]);
   // La sortie du quai (métro) est comptée avec la marche finale.
   const exit = graph.access[chain[chain.length - 1]];
-  steps.push({ kind: "walk", text: "À pied jusqu'à l'arrivée", minutes: result.walk + exit });
+  steps.push({ kind: "walk", text: "도착지까지 도보", minutes: result.walk + exit });
   return { minutes: result.minutes, steps };
 }
 
@@ -620,6 +668,7 @@ function buildPaths(data) {
     // Un chemin par polygone, rempli en « evenodd » : les îles (trous) restent de la terre ferme,
     // sans que deux plans d'eau qui se chevauchent s'annulent.
     water: data.water.map((polygon) => polygonsPath([polygon])),
+    coastSea: polygonsPath(data.coastSea ?? []),
     parks: data.parks.map((polygon) => polygonsPath([polygon])),
     communeLines,
     routes: [...routes.values()].reverse(),
@@ -724,7 +773,7 @@ function drawIsochrones() {
     }
     candidates.sort((p, q) => p.at[1] - q.at[1]);
     const best = candidates.find((candidate) => isOnLand(candidate.world));
-    if (best) labels.push({ text: `${threshold} min`, at: best.at });
+    if (best) labels.push({ text: `${threshold}분`, at: best.at });
   }
   useScreenTransform();
   ctx.textAlign = "center";
@@ -849,6 +898,9 @@ function render() {
   ctx.strokeStyle = COLORS.communeLine;
   ctx.lineWidth = 1.1 * px;
   ctx.stroke(app.paths.communeLines);
+  // Les limites de district coréennes s'étendent en mer : la mer passe par-dessus leurs traits.
+  ctx.fillStyle = COLORS.water;
+  ctx.fill(app.paths.coastSea, "evenodd");
 
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
@@ -864,9 +916,9 @@ function render() {
   drawStops();
   if (app.to) {
     const minutes = app.solution ? formatMinutes(travelTo(app.solution, app.to.point).minutes) : null;
-    drawMarker(app.to.point, COLORS.to, app.heatFrom === "to" ? `Arrivée · ${minutes}` : minutes);
+    drawMarker(app.to.point, COLORS.to, app.heatFrom === "to" ? `도착 · ${minutes}` : minutes);
   }
-  if (app.from) drawMarker(app.from.point, COLORS.from, "Départ");
+  if (app.from) drawMarker(app.from.point, COLORS.from, "출발");
 }
 
 function requestRender() {
@@ -918,7 +970,7 @@ function nearestStopName(point) {
 function describePlace(point) {
   const stop = nearestStopName(point);
   const commune = communeAt(point);
-  return commune && commune !== CITY.name ? `Près de ${stop} (${commune})` : `Près de ${stop}`;
+  return commune && commune !== CITY.name ? `${stop} 부근 (${commune})` : `${stop} 부근`;
 }
 
 function heatSource() {
@@ -1000,7 +1052,7 @@ function updatePanel() {
             badge.textContent = "🚶";
           }
           const text = document.createElement("span");
-          text.textContent = step.kind === "ride" ? `${step.text} · attente ~${Math.round(step.wait)} min` : step.text;
+          text.textContent = step.kind === "ride" ? `${step.text} · 대기 약 ${Math.round(step.wait)}분` : step.text;
           const minutes = document.createElement("span");
           minutes.className = "minutes";
           minutes.textContent = formatMinutes(step.minutes);
@@ -1018,10 +1070,9 @@ function updatePanel() {
       return Math.min(byFoot, app.heatSolution.stationTime[index]) <= REACH_MINUTES;
     }).length;
     const percent = Math.round((reachable / tram.length) * 100);
-    const where = source === app.from ? "de ce départ" : "de cette arrivée";
-    $("reach").textContent = `${percent} % des ${CITY.railStations} sont à moins de ${REACH_MINUTES} minutes ${where}${
-      app.includeBus ? ` (${CITY.railNoun} + ${CITY.busNoun})` : ""
-    }.`;
+    const where = source === app.from ? "이 출발지에서" : "이 도착지에서";
+    const byBus = app.includeBus ? ` ${CITY.busNoun}까지 타면` : "";
+    $("reach").textContent = `${where}${byBus} ${REACH_MINUTES}분 안에 닿는 ${CITY.railStations}: 전체의 ${percent}%`;
   }
 }
 
@@ -1034,9 +1085,9 @@ function contrastText(hex) {
 function updateLegend() {
   const stops = PALETTE.map(([t, [r, g, b]]) => `rgb(${r}, ${g}, ${b}) ${Math.round(t * 100)}%`);
   $("legendBar").style.background = `linear-gradient(90deg, ${stops.join(", ")})`;
-  $("legendMid").textContent = `${Math.round(app.maxMinutes / 2)} min`;
-  $("legendMax").textContent = `${app.maxMinutes} min`;
-  $("maxValue").textContent = `${app.maxMinutes} min`;
+  $("legendMid").textContent = `${Math.round(app.maxMinutes / 2)}분`;
+  $("legendMax").textContent = `${app.maxMinutes}분`;
+  $("maxValue").textContent = `${app.maxMinutes}분`;
 }
 
 function formatPair(point) {
@@ -1174,7 +1225,7 @@ function endPointer(event) {
   canvas.classList.remove("panning");
   if (event.type === "pointercancel") return;
   if (drag.kind === "pan" && !drag.moved) {
-    if (!setTo(unproject(...eventPoint(event)))) toast("Ce point est hors de la Métropole ou sur l'eau.");
+    if (!setTo(unproject(...eventPoint(event)))) toast("지도 범위 밖이거나 물 위입니다.");
   } else if (drag.kind === "marker") {
     recompute();
     syncUrl();
@@ -1277,7 +1328,7 @@ $("maxRange").addEventListener("input", (event) => {
 
 $("swap").addEventListener("click", () => {
   if (!app.to) {
-    toast("Posez d'abord une arrivée sur la carte.");
+    toast("먼저 지도에 도착지를 찍어 주세요.");
     return;
   }
   [app.from, app.to] = [app.to, app.from];
@@ -1296,18 +1347,18 @@ $("heatFrom").addEventListener("click", (event) => {
 
 $("locate").addEventListener("click", () => {
   if (!navigator.geolocation) {
-    toast("La géolocalisation n'est pas disponible.");
+    toast("위치 정보를 사용할 수 없습니다.");
     return;
   }
   navigator.geolocation.getCurrentPosition(
     ({ coords }) => {
-      if (!setFrom(toWorld(coords.latitude, coords.longitude), "Ma position")) toast("Vous êtes hors de la Métropole.");
+      if (!setFrom(toWorld(coords.latitude, coords.longitude), "내 위치")) toast("현재 위치가 지도 범위 밖입니다.");
     },
     (error) =>
       toast(
         error.code === error.PERMISSION_DENIED
-          ? "Position refusée : autorisez la localisation, ou cherchez une adresse."
-          : "Impossible d'obtenir votre position : cherchez plutôt une adresse.",
+          ? "위치 권한이 거부되었습니다. 권한을 허용하거나 역을 검색해 주세요."
+          : "현재 위치를 가져오지 못했습니다. 역을 검색해 주세요.",
       ),
     // Sans délai maximal, certains navigateurs intégrés (X, Reddit…) n'appellent jamais aucun des deux rappels.
     { timeout: 10000, maximumAge: 60000 },
@@ -1326,46 +1377,57 @@ $("share").addEventListener("click", async () => {
   }
   try {
     await navigator.clipboard.writeText(url);
-    toast("Lien copié !");
+    toast("링크를 복사했습니다.");
   } catch {
     toast(url);
   }
 });
 
-// --- Recherche d'adresse (Base Adresse Nationale) ----------------------------
+// --- Recherche : stations, et adresses si la ville a un géocodeur (geocoderUrl) ---
 
 const searchInput = $("searchInput");
 const searchResults = $("searchResults");
 let searchTimer = null;
 let searchController = null;
+let searchActive = -1;
 
 function normalize(text) {
   return text
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
 }
 
-/** Arrêts de tram dont le nom contient tous les mots tapés. */
+/** Arrêts dont le nom contient tous les mots tapés : nom exact d'abord, puis tram/métro avant bus, puis noms courts. */
 function searchStops(query) {
-  const words = normalize(query).split(" ");
+  // Les noms de station n'ont pas « 역 » (gare) : « 강남역 » cherche « 강남 ».
+  const wanted = normalize(query.replace(/(\S)역(?=\s|$)/g, "$1"));
+  const typed = normalize(query);
+  const words = wanted.split(" ");
+  const exact = (name) => name === wanted || name === typed;
   return app.data.stations
-    .filter((station) => station.rail && words.every((word) => normalize(station.name).includes(word)))
-    .slice(0, 3)
-    .map((station) => ({
-      label: station.name,
-      context: `Station · ${station.routes
-        .filter((id) => app.data.routeInfo[id]?.rail)
-        .map((id) => routeLabel(id))
-        .join(", ")}`,
-      point: station.point,
-    }));
+    .map((station) => ({ station, name: normalize(station.name) }))
+    .filter(({ name }) => words.every((word) => name.includes(word)))
+    .sort((a, b) => exact(b.name) - exact(a.name) || b.station.rail - a.station.rail || a.name.length - b.name.length)
+    .slice(0, 6)
+    .map(({ station }) => {
+      const rail = station.routes.filter((id) => app.data.routeInfo[id]?.rail);
+      const commune = communeAt(station.point);
+      return {
+        label: station.name,
+        context: rail.length
+          ? `역 · ${rail.map((id) => app.data.routeInfo[id].name).join(", ")}`
+          : `버스 정류장${commune ? ` · ${commune}` : ""} · ${station.routes.slice(0, 4).map((id) => app.data.routeInfo[id].name).join(", ")}`,
+        point: station.point,
+      };
+    });
 }
 
 async function searchAddress(query) {
   const stops = searchStops(query);
+  if (!GEOCODER_URL) return stops;
   searchController?.abort();
   searchController = new AbortController();
   const params = new URLSearchParams({ q: query, limit: "6", lat: String(DEFAULT_FROM.lat), lon: String(DEFAULT_FROM.lon) });
@@ -1401,7 +1463,34 @@ function showResults(results) {
     }),
   );
   searchResults.hidden = !results.length;
+  searchActive = -1;
 }
+
+/** Résultat surligné au clavier (flèches), choisi par Entrée. */
+function highlightResult(index) {
+  const buttons = [...searchResults.querySelectorAll("button")];
+  searchActive = index;
+  buttons.forEach((button, i) => button.classList.toggle("active", i === index));
+  buttons[index]?.scrollIntoView({ block: "nearest" });
+}
+
+searchInput.addEventListener("keydown", (event) => {
+  // Pendant la composition d'une syllabe (coréen), les touches appartiennent à la méthode de saisie.
+  if (event.isComposing || searchResults.hidden) return;
+  const count = searchResults.children.length;
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    highlightResult((searchActive + 1) % count);
+  } else if (event.key === "ArrowUp") {
+    event.preventDefault();
+    highlightResult(searchActive <= 0 ? count - 1 : searchActive - 1);
+  } else if (event.key === "Enter" && searchActive >= 0) {
+    event.preventDefault();
+    searchResults.querySelectorAll("button")[searchActive].click();
+  } else if (event.key === "Escape") {
+    searchResults.hidden = true;
+  }
+});
 
 function chooseResult(result) {
   searchResults.hidden = true;
@@ -1417,7 +1506,7 @@ function chooseResult(result) {
 searchInput.addEventListener("input", () => {
   clearTimeout(searchTimer);
   const query = searchInput.value.trim();
-  if (query.length < 3) {
+  if (query.length < MIN_QUERY_LENGTH) {
     searchResults.hidden = true;
     return;
   }
@@ -1433,13 +1522,13 @@ searchInput.addEventListener("input", () => {
 $("searchForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const query = searchInput.value.trim();
-  if (query.length < 3) return;
+  if (query.length < MIN_QUERY_LENGTH) return;
   try {
     const results = await searchAddress(query);
     if (results.length) chooseResult(results[0]);
-    else toast("Adresse introuvable dans la Métropole.");
+    else toast("검색 결과가 없습니다.");
   } catch (error) {
-    if (error.name !== "AbortError") toast("La recherche d'adresse ne répond pas.");
+    if (error.name !== "AbortError") toast("검색이 응답하지 않습니다.");
   }
 });
 
@@ -1454,8 +1543,8 @@ async function init() {
   const response = await fetch(DATA_URL);
   app.data = await response.json();
   app.offset = [app.data.meta.bounds[0], app.data.meta.bounds[1]];
-  app.graph = prepareGraph(app.data);
   app.rivers = indexRivers(app.data.rivers);
+  app.graph = prepareGraph(app.data);
   app.paths = buildPaths(app.data);
   app.size.width = 0;
   resize();
@@ -1465,5 +1554,5 @@ async function init() {
 
 init().catch((error) => {
   console.error(error);
-  $("tripFrom").textContent = "Impossible de charger le réseau.";
+  $("tripFrom").textContent = "노선 데이터를 불러오지 못했습니다.";
 });

@@ -10,9 +10,10 @@
   --surface-alt: #f7f7f5;
   --radius: 16px;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   color: var(--ink);
   background: var(--surface);
+  word-break: keep-all;
 }
 
 * {
@@ -41,8 +42,7 @@ a {
 /* --- Top bar ------------------------------------------------------------ */
 
 .topbar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 20;
   padding: 10px 16px;
 }
@@ -373,7 +373,8 @@ h1 {
 }
 
 .search-results button:hover,
-.search-results button:focus-visible {
+.search-results button:focus-visible,
+.search-results button.active {
   background: var(--surface-alt);
 }
 
@@ -427,6 +428,10 @@ h1 {
 }
 
 .icon-button[hidden] {
+  display: none;
+}
+
+.pill-toggle[hidden] {
   display: none;
 }
 
@@ -1193,11 +1198,6 @@ output {
 }
 
 @media (max-width: 720px) {
-  /* Sur mobile, la barre défile avec la page pour ne pas masquer le haut de la carte. */
-  .topbar {
-    position: static;
-  }
-
   .stat-grid {
     grid-template-columns: 1fr 1fr;
   }

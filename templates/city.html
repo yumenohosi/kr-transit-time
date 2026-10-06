@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="ko">
   <head>
 ${head}
     <link rel="stylesheet" href="${base}styles.css?v=${styles_version}" />
@@ -9,72 +9,72 @@ ${head}
 ${header}
 
     <main class="page">
-      <nav class="breadcrumb" aria-label="Fil d'Ariane">
-        <a href="${base}">À portée de tram</a> <span aria-hidden="true">›</span> <span aria-current="page">${name}</span>
+      <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="${base}">${site_name}</a> <span aria-hidden="true">›</span> <span aria-current="page">${name}</span>
       </nav>
 
       <section class="hero">
         <h1>${headline}</h1>
-        <div id="cityPanel" class="city-panel" role="dialog" aria-label="Choisir une ville" hidden>
+        <div id="cityPanel" class="city-panel" role="dialog" aria-label="도시 선택" hidden>
           <div class="city-panel-head">
-            <input id="citySearch" type="search" placeholder="Rechercher une ville…" aria-label="Rechercher une ville" autocomplete="off" />
-            <button id="cityClose" type="button" class="icon-button" aria-label="Fermer">×</button>
+            <input id="citySearch" type="search" placeholder="도시 검색…" aria-label="도시 검색" autocomplete="off" />
+            <button id="cityClose" type="button" class="icon-button" aria-label="닫기">×</button>
           </div>
-          <nav class="city-panel-list" aria-label="Villes">
+          <nav class="city-panel-list" aria-label="도시">
 ${city_items}
           </nav>
         </div>
         <p class="lede">
-          La ville redessinée par le temps qu'il faut pour y aller en ${rail_noun}. Choisissez un départ&nbsp;: la carte se
-          colore selon le temps de trajet vers chaque point ${area}.
+          ${rail_noun} 소요시간으로 다시 그린 도시입니다. 출발지를 고르면 ${area} 곳곳까지 걸리는 시간이 색으로
+          표시됩니다.
         </p>
         <form id="searchForm" class="search" role="search" autocomplete="off">
-          <label class="visually-hidden" for="searchInput">Adresse de départ</label>
-          <input id="searchInput" type="search" placeholder="Partir d'une adresse… (ex. ${search_example})" />
-          <button type="submit" class="button primary">Partir d'ici</button>
+          <label class="visually-hidden" for="searchInput">출발지</label>
+          <input id="searchInput" type="search" placeholder="${search_placeholder}" />
+          <button type="submit" class="button primary">여기서 출발</button>
           <ul id="searchResults" class="search-results" hidden></ul>
         </form>
-        <ol class="steps" aria-label="Mode d'emploi">
-          <li><strong>1. Départ</strong> Cherchez une adresse ou glissez le point vert.</li>
-          <li><strong>2. Arrivée</strong> Cliquez n'importe où : durée et itinéraire détaillé.</li>
-          <li><strong>3. Lecture</strong> Vert = proche, rouge = loin. Lignes noires : 15 et 30 min.</li>
+        <ol class="steps" aria-label="사용법">
+          <li><strong>1. 출발</strong> ${search_step}</li>
+          <li><strong>2. 도착</strong> 지도 아무 곳이나 누르면 소요시간과 상세 경로가 나옵니다.</li>
+          <li><strong>3. 읽는 법</strong> 초록은 가깝고 빨강은 멉니다. 검은 선은 15분·30분 경계입니다.</li>
         </ol>
       </section>
 
-      <section class="map-card" aria-label="Carte des temps de trajet">
+      <section class="map-card" aria-label="소요시간 지도">
         <noscript>
           <p class="noscript">
-            Cette carte interactive a besoin de JavaScript pour calculer les temps de trajet. Activez-le pour l'utiliser.
+            이 지도는 소요시간을 계산하려면 JavaScript가 필요합니다. JavaScript를 켜 주세요.
           </p>
         </noscript>
         <div id="mapStage" class="map-stage">
           <canvas id="mapCanvas"></canvas>
 
           <aside id="tripPanel" class="trip-panel" aria-live="polite">
-            <p class="trip-eyebrow">Départ</p>
-            <p id="tripFrom" class="trip-from">Chargement du réseau…</p>
+            <p class="trip-eyebrow">출발</p>
+            <p id="tripFrom" class="trip-from">노선 데이터를 불러오는 중…</p>
             <div id="tripResult" class="trip-result" hidden>
               <div class="trip-row">
-                <p class="trip-eyebrow">Arrivée</p>
-                <button id="removeTo" type="button" class="link-button">Retirer</button>
+                <p class="trip-eyebrow">도착</p>
+                <button id="removeTo" type="button" class="link-button">지우기</button>
               </div>
               <p id="tripTo" class="trip-to"></p>
               <p id="tripDuration" class="trip-duration"></p>
               <ol id="tripSteps" class="trip-steps"></ol>
-              <div id="heatFrom" class="segmented" role="group" aria-label="Point d'où part la carte">
-                <span>Carte depuis</span>
-                <button type="button" data-source="from" aria-pressed="true">le départ</button>
-                <button type="button" data-source="to" aria-pressed="false">l'arrivée</button>
+              <div id="heatFrom" class="segmented" role="group" aria-label="지도 색칠 기준">
+                <span>색칠 기준</span>
+                <button type="button" data-source="from" aria-pressed="true">출발지</button>
+                <button type="button" data-source="to" aria-pressed="false">도착지</button>
               </div>
             </div>
-            <p id="tripHint" class="trip-hint">Cliquez sur la carte pour poser une arrivée.</p>
+            <p id="tripHint" class="trip-hint">지도를 눌러 도착지를 찍어 보세요.</p>
           </aside>
 
           <div class="map-buttons">
-            <button id="zoomIn" type="button" class="icon-button" aria-label="Zoomer">+</button>
-            <button id="zoomOut" type="button" class="icon-button" aria-label="Dézoomer">−</button>
-            <button id="recenter" type="button" class="icon-button" aria-label="Recentrer la carte">⌖</button>
-            <button id="fullscreen" type="button" class="icon-button" aria-label="Plein écran">⤢</button>
+            <button id="zoomIn" type="button" class="icon-button" aria-label="확대">+</button>
+            <button id="zoomOut" type="button" class="icon-button" aria-label="축소">−</button>
+            <button id="recenter" type="button" class="icon-button" aria-label="지도 다시 맞추기">⌖</button>
+            <button id="fullscreen" type="button" class="icon-button" aria-label="전체 화면">⤢</button>
           </div>
 
           <div class="legend" aria-hidden="true">
@@ -85,63 +85,55 @@ ${city_items}
 
         <div class="controls">
           <div class="control-group">
-            <span class="control-label">Réseau</span>
+            <span class="control-label">노선</span>
             <label class="pill-toggle"><input type="checkbox" checked disabled /> ${rail_label}</label>
-            <label class="pill-toggle"><input id="busToggle" type="checkbox" /> ${bus_label}</label>
+${bus_toggle}
           </div>
           <div id="isoToggles" class="control-group">
-            <span class="control-label">Isochrones</span>
-            <label class="pill-toggle"><input type="checkbox" value="15" checked /> 15 min</label>
-            <label class="pill-toggle"><input type="checkbox" value="30" checked /> 30 min</label>
-            <label class="pill-toggle"><input type="checkbox" value="45" /> 45 min</label>
-            <label class="pill-toggle"><input type="checkbox" value="60" /> 60 min</label>
+            <span class="control-label">등시선</span>
+            <label class="pill-toggle"><input type="checkbox" value="15" checked /> 15분</label>
+            <label class="pill-toggle"><input type="checkbox" value="30" checked /> 30분</label>
+            <label class="pill-toggle"><input type="checkbox" value="45" /> 45분</label>
+            <label class="pill-toggle"><input type="checkbox" value="60" /> 60분</label>
           </div>
           <div class="control-group">
-            <label class="control-label" for="maxRange">Échelle</label>
+            <label class="control-label" for="maxRange">색 범위</label>
             <input id="maxRange" type="range" min="20" max="90" step="5" value="45" />
-            <output id="maxValue" for="maxRange">45 min</output>
+            <output id="maxValue" for="maxRange">45분</output>
           </div>
           <div class="control-group actions">
-            <button id="locate" type="button" class="button">Ma position</button>
-            <button id="swap" type="button" class="button">Inverser</button>
-            <button id="share" type="button" class="button primary">Partager</button>
+            <button id="locate" type="button" class="button">내 위치</button>
+            <button id="swap" type="button" class="button">출발·도착 바꾸기</button>
+            <button id="share" type="button" class="button primary">공유</button>
           </div>
         </div>
         <p id="reach" class="reach"></p>
       </section>
 
       <section class="section" aria-labelledby="stats-title">
-        <h2 id="stats-title">${name} en chiffres</h2>
+        <h2 id="stats-title">숫자로 보는 ${name}</h2>
         <div class="stat-grid">
 ${stat_tiles}
         </div>
         <table class="lines-table">
-          <caption>Lignes de ${rail_noun} du réseau ${network}, en journée de semaine</caption>
-          <thead><tr><th scope="col">Ligne</th><th scope="col">Stations</th><th scope="col">Un passage toutes les</th></tr></thead>
+          <caption>${network} ${rail_noun} 노선 (평일 낮 기준)</caption>
+          <thead><tr><th scope="col">노선</th><th scope="col">역 수</th><th scope="col">배차 간격</th></tr></thead>
           <tbody>
 ${line_rows}
           </tbody>
         </table>
-${ranking_positions}
       </section>
 
       <section class="section" aria-labelledby="faq-title">
-        <h2 id="faq-title">Questions fréquentes</h2>
+        <h2 id="faq-title">자주 묻는 질문</h2>
 ${faq_html}
       </section>
-
-      <section class="section" aria-labelledby="cities-title">
-        <h2 id="cities-title">Les autres villes</h2>
-        <div class="city-grid">
 ${other_cities}
-        </div>
-      </section>
     </main>
 
 ${footer}
 
     <div id="toast" class="toast" role="status" hidden></div>
     <script type="module" src="${base}app.js?v=${app_version}"></script>
-${analytics}
   </body>
 </html>

@@ -1,0 +1,38 @@
+{
+  "slug": "daegu",
+  "order": 3,
+  "name": "대구",
+  "network": "대구 도시철도",
+  "metropole": "대구광역시",
+  "linePrefix": "대구",
+  "boundaries": {
+    "area": "KR-27",
+    "adminLevel": "6"
+  },
+  "communes": "served",
+  "osmRailRoutes": "subway|light_rail|train|monorail",
+  "osmRefAliases": {
+    "1": "1호선",
+    "2": "2호선",
+    "3": "3호선",
+    "대경": "대경선"
+  },
+  "rivers": [
+    "금호강",
+    "낙동강"
+  ],
+  "defaultFrom": {
+    "lat": 35.86457,
+    "lon": 128.59333,
+    "label": "반월당"
+  },
+  "searchExample": "동대구",
+  "kind": "metro",
+  "gtfsManual": "국가교통DB GTFS를 tools/ktdb_gtfs.py로 변환",
+  "gtfsUrl": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsDataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsLicence": "ktdb",
+  "railGeometry": "osm",
+  "view": "land",
+  "published": "2026-10-06"
+}

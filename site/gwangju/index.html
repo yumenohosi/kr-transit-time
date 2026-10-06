@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>광주 지하철 시간 지도 · 지하철 소요시간 · 광주 도시철도</title>
+    <meta name="description" content="광주 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(광주 도시철도)." />
+    <link rel="canonical" href="https://example.com/gwangju/" />
+    <meta name="theme-color" content="#3aa70b" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:site_name" content="대중교통 시간 지도" />
+    <meta property="og:title" content="광주 지하철 시간 지도" />
+    <meta property="og:description" content="광주 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(광주 도시철도)." />
+    <meta property="og:url" content="https://example.com/gwangju/" />
+    <meta property="og:image" content="https://example.com/og/gwangju.jpg?v=d34fc234" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="문화전당에서 출발하는 지하철 소요시간으로 색칠한 광주 지도, 15분·30분 등시선 포함." />
+    <meta property="article:published_time" content="2026-10-06T08:00:00+09:00" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="광주 지하철 시간 지도" />
+    <meta name="twitter:description" content="광주 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(광주 도시철도)." />
+    <meta name="twitter:image" content="https://example.com/og/gwangju.jpg?v=d34fc234" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "광주 지하철 시간 지도",
+          "url": "https://example.com/gwangju/",
+          "description": "광주 지하철 소요시간 지도: 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색으로 표시됩니다(광주 도시철도).",
+          "inLanguage": "ko",
+          "applicationCategory": "TravelApplication",
+          "operatingSystem": "Web",
+          "isAccessibleForFree": true,
+          "image": "https://example.com/og/gwangju.jpg",
+          "spatialCoverage": {
+            "@type": "Place",
+            "name": "광주광역시"
+          },
+          "isBasedOn": [
+            "https://github.com/camilleroux/montpellier-temps-transport",
+            "https://castrio.me/nyc/",
+            "https://julesgrandin.github.io/paris-temps-transport/"
+          ],
+          "datePublished": "2026-10-06",
+          "dateModified": "2026-10-06"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "대중교통 시간 지도",
+              "item": "https://example.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "광주",
+              "item": "https://example.com/gwangju/"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "광주 지하철, 끝에서 끝까지 얼마나 걸리나요?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "중심(문화전당)에서 출발하면 지하철역의 55%가 15분 안에, 100%가 30분 안에 닿습니다(도보·대기 포함). 가장 먼 역인 평동까지는 약 26분입니다."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "광주 지하철 노선은 얼마나 자주 다니나요?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "평일 낮 평균 배차 간격은 1호선 8.5분입니다. 가장 자주 다니는 노선은 1호선으로, 약 8.5분마다 옵니다."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "어떤 시간표를 쓰나요?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "광주 도시철도 계획 시간표(GTFS, 국가교통DB 제공 자료)를 사용합니다. 2026년 10월 6일에 받은 자료입니다. 시간표 유효 기간은 2030년 12월 31일까지입니다. 소요시간은 2026년 10월 6일 화요일 7시~20시 기준입니다."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "광주에서 버스도 계산되나요?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "선택할 수 있습니다. 지도 아래 ‘버스’ 항목을 켜면 됩니다. 기본은 지하철만 표시합니다. 드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "소요시간은 어떻게 계산하나요?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "시속 4.5km로 정류장까지 걷고, 배차 간격의 절반만큼 기다리고, 시간표상 역 사이 소요시간을 더합니다. 환승할 때는 도보 1.5분을 더합니다. 지하철은 승강장까지 오가는 1분도 더합니다. 실시간 정보나 운행 장애는 반영하지 않는, ‘시간표상’ 도시입니다."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "이 광주 지도는 어디서 왔나요?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "아이디어는 Anthony Castrio의 NYC Transit Time Cartogram과, 이를 파리에 옮긴 Jules Grandin의 « C'est encore loin ? »에서 왔습니다. 코드는 Camille Roux가 프랑스 도시용으로 만든 « À portée de tram »(MIT 라이선스)을 포크했습니다."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" />
+    <link rel="stylesheet" href="../styles.css?v=0afb52df" />
+  </head>
+  <body>
+    <script id="city-config" type="application/json">{"slug": "gwangju", "name": "광주", "dataVersion": "0c53d2d5", "defaultFrom": {"lat": 35.14673, "lon": 126.91983, "label": "문화전당"}, "railNoun": "지하철", "railStations": "지하철역", "busNoun": "버스", "geocoderUrl": null}</script>
+    <header class="topbar">
+      <nav class="topbar-inner" aria-label="주 메뉴">
+        <a class="brand" href="../"><img src="../favicon.svg" width="22" height="22" alt="" /> 대중교통 시간 지도</a>
+        <div class="topbar-links">
+          <a class="topbar-link" href="../credits/">출처와 라이선스</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="page">
+      <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="../">대중교통 시간 지도</a> <span aria-hidden="true">›</span> <span aria-current="page">광주</span>
+      </nav>
+
+      <section class="hero">
+        <h1><button id="cityTrigger" type="button" class="city-trigger" aria-haspopup="dialog" aria-expanded="false" title="도시 바꾸기">광주<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button> 지하철 시간&nbsp;지도</h1>
+        <div id="cityPanel" class="city-panel" role="dialog" aria-label="도시 선택" hidden>
+          <div class="city-panel-head">
+            <input id="citySearch" type="search" placeholder="도시 검색…" aria-label="도시 검색" autocomplete="off" />
+            <button id="cityClose" type="button" class="icon-button" aria-label="닫기">×</button>
+          </div>
+          <nav class="city-panel-list" aria-label="도시">
+            <a class="city-item" href="../seoul/" data-name="서울"><img src="../og/thumb-seoul.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>서울</strong><small>지하철 · 수도권 전철</small></span></a>
+            <a class="city-item" href="../busan/" data-name="부산"><img src="../og/thumb-busan.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>부산</strong><small>지하철 · 부산 도시철도</small></span></a>
+            <a class="city-item" href="../daegu/" data-name="대구"><img src="../og/thumb-daegu.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>대구</strong><small>지하철 · 대구 도시철도</small></span></a>
+            <a class="city-item" href="../daejeon/" data-name="대전"><img src="../og/thumb-daejeon.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>대전</strong><small>지하철 · 대전 도시철도</small></span></a>
+            <a class="city-item current" href="../gwangju/" aria-current="page" data-name="광주"><img src="../og/thumb-gwangju.jpg" width="120" height="63" alt="" loading="lazy" /><span><strong>광주</strong><small>지하철 · 광주 도시철도</small></span></a>
+          </nav>
+        </div>
+        <p class="lede">
+          지하철 소요시간으로 다시 그린 도시입니다. 출발지를 고르면 광주광역시 곳곳까지 걸리는 시간이 색으로
+          표시됩니다.
+        </p>
+        <form id="searchForm" class="search" role="search" autocomplete="off">
+          <label class="visually-hidden" for="searchInput">출발지</label>
+          <input id="searchInput" type="search" placeholder="역·정류장 검색… (예: 상무)" />
+          <button type="submit" class="button primary">여기서 출발</button>
+          <ul id="searchResults" class="search-results" hidden></ul>
+        </form>
+        <ol class="steps" aria-label="사용법">
+          <li><strong>1. 출발</strong> 역·정류장을 검색하거나 초록 점을 끌어 옮기세요.</li>
+          <li><strong>2. 도착</strong> 지도 아무 곳이나 누르면 소요시간과 상세 경로가 나옵니다.</li>
+          <li><strong>3. 읽는 법</strong> 초록은 가깝고 빨강은 멉니다. 검은 선은 15분·30분 경계입니다.</li>
+        </ol>
+      </section>
+
+      <section class="map-card" aria-label="소요시간 지도">
+        <noscript>
+          <p class="noscript">
+            이 지도는 소요시간을 계산하려면 JavaScript가 필요합니다. JavaScript를 켜 주세요.
+          </p>
+        </noscript>
+        <div id="mapStage" class="map-stage">
+          <canvas id="mapCanvas"></canvas>
+
+          <aside id="tripPanel" class="trip-panel" aria-live="polite">
+            <p class="trip-eyebrow">출발</p>
+            <p id="tripFrom" class="trip-from">노선 데이터를 불러오는 중…</p>
+            <div id="tripResult" class="trip-result" hidden>
+              <div class="trip-row">
+                <p class="trip-eyebrow">도착</p>
+                <button id="removeTo" type="button" class="link-button">지우기</button>
+              </div>
+              <p id="tripTo" class="trip-to"></p>
+              <p id="tripDuration" class="trip-duration"></p>
+              <ol id="tripSteps" class="trip-steps"></ol>
+              <div id="heatFrom" class="segmented" role="group" aria-label="지도 색칠 기준">
+                <span>색칠 기준</span>
+                <button type="button" data-source="from" aria-pressed="true">출발지</button>
+                <button type="button" data-source="to" aria-pressed="false">도착지</button>
+              </div>
+            </div>
+            <p id="tripHint" class="trip-hint">지도를 눌러 도착지를 찍어 보세요.</p>
+          </aside>
+
+          <div class="map-buttons">
+            <button id="zoomIn" type="button" class="icon-button" aria-label="확대">+</button>
+            <button id="zoomOut" type="button" class="icon-button" aria-label="축소">−</button>
+            <button id="recenter" type="button" class="icon-button" aria-label="지도 다시 맞추기">⌖</button>
+            <button id="fullscreen" type="button" class="icon-button" aria-label="전체 화면">⤢</button>
+          </div>
+
+          <div class="legend" aria-hidden="true">
+            <div id="legendBar" class="legend-bar"></div>
+            <div class="legend-labels"><span>0</span><span id="legendMid"></span><span id="legendMax"></span></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <span class="control-label">노선</span>
+            <label class="pill-toggle"><input type="checkbox" checked disabled /> 지하철</label>
+            <label class="pill-toggle"><input id="busToggle" type="checkbox" /> 버스</label>
+          </div>
+          <div id="isoToggles" class="control-group">
+            <span class="control-label">등시선</span>
+            <label class="pill-toggle"><input type="checkbox" value="15" checked /> 15분</label>
+            <label class="pill-toggle"><input type="checkbox" value="30" checked /> 30분</label>
+            <label class="pill-toggle"><input type="checkbox" value="45" /> 45분</label>
+            <label class="pill-toggle"><input type="checkbox" value="60" /> 60분</label>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="maxRange">색 범위</label>
+            <input id="maxRange" type="range" min="20" max="90" step="5" value="45" />
+            <output id="maxValue" for="maxRange">45분</output>
+          </div>
+          <div class="control-group actions">
+            <button id="locate" type="button" class="button">내 위치</button>
+            <button id="swap" type="button" class="button">출발·도착 바꾸기</button>
+            <button id="share" type="button" class="button primary">공유</button>
+          </div>
+        </div>
+        <p id="reach" class="reach"></p>
+      </section>
+
+      <section class="section" aria-labelledby="stats-title">
+        <h2 id="stats-title">숫자로 보는 광주</h2>
+        <div class="stat-grid">
+          <div class="stat"><strong>100%</strong><span>지하철역 중 중심(문화전당)에서 30분 안에 닿는 비율</span></div>
+          <div class="stat"><strong>20</strong><span>지하철역</span></div>
+          <div class="stat"><strong>8.5분</strong><span>가장 자주 다니는 1호선의 배차 간격</span></div>
+          <div class="stat"><strong>26분</strong><span>중심에서 가장 먼 역 평동까지</span></div>
+        </div>
+        <table class="lines-table">
+          <caption>광주 도시철도 지하철 노선 (평일 낮 기준)</caption>
+          <thead><tr><th scope="col">노선</th><th scope="col">역 수</th><th scope="col">배차 간격</th></tr></thead>
+          <tbody>
+            <tr><td><span class="line-badge" style="background:#009088;color:#fff">1호선</span> 지하철</td><td>20</td><td>약 8.5분</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" aria-labelledby="faq-title">
+        <h2 id="faq-title">자주 묻는 질문</h2>
+        <details class="faq"><summary>광주 지하철, 끝에서 끝까지 얼마나 걸리나요?</summary><p>중심(문화전당)에서 출발하면 지하철역의 55%가 15분 안에, 100%가 30분 안에 닿습니다(도보·대기 포함). 가장 먼 역인 평동까지는 약 26분입니다.</p></details>
+        <details class="faq"><summary>광주 지하철 노선은 얼마나 자주 다니나요?</summary><p>평일 낮 평균 배차 간격은 1호선 8.5분입니다. 가장 자주 다니는 노선은 1호선으로, 약 8.5분마다 옵니다.</p></details>
+        <details class="faq"><summary>어떤 시간표를 쓰나요?</summary><p>광주 도시철도 계획 시간표(GTFS, 국가교통DB 제공 자료)를 사용합니다. 2026년 10월 6일에 받은 자료입니다. 시간표 유효 기간은 2030년 12월 31일까지입니다. 소요시간은 2026년 10월 6일 화요일 7시~20시 기준입니다.</p></details>
+        <details class="faq"><summary>광주에서 버스도 계산되나요?</summary><p>선택할 수 있습니다. 지도 아래 ‘버스’ 항목을 켜면 됩니다. 기본은 지하철만 표시합니다. 드물게 오는 버스의 대기시간은 최대 15분으로 잡습니다.</p></details>
+        <details class="faq"><summary>소요시간은 어떻게 계산하나요?</summary><p>시속 4.5km로 정류장까지 걷고, 배차 간격의 절반만큼 기다리고, 시간표상 역 사이 소요시간을 더합니다. 환승할 때는 도보 1.5분을 더합니다. 지하철은 승강장까지 오가는 1분도 더합니다. 실시간 정보나 운행 장애는 반영하지 않는, ‘시간표상’ 도시입니다.</p></details>
+        <details class="faq"><summary>이 광주 지도는 어디서 왔나요?</summary><p>아이디어는 Anthony Castrio의 <a href="https://castrio.me/nyc/">NYC Transit Time Cartogram</a>과, 이를 파리에 옮긴 Jules Grandin의 <a href="https://julesgrandin.github.io/paris-temps-transport/">C'est encore loin&nbsp;?</a>에서 왔습니다. 코드는 Camille Roux가 프랑스 도시용으로 만든 <a href="https://github.com/camilleroux/montpellier-temps-transport">À portée de tram</a>(MIT 라이선스)을 포크했습니다.</p></details>
+      </section>
+
+      <section class="section" aria-labelledby="cities-title">
+        <h2 id="cities-title">다른 도시</h2>
+        <div class="city-grid">
+          <a class="city-card" href="../seoul/">
+            <img src="../og/thumb-seoul.jpg" width="600" height="315" alt="" loading="lazy" />
+            <span class="city-card-body">
+              <h3>서울 지하철 시간 지도</h3>
+              <span>지하철역의 30%가 중심(시청)에서 30분 안 · 수도권 전철</span>
+            </span>
+          </a>
+          <a class="city-card" href="../busan/">
+            <img src="../og/thumb-busan.jpg" width="600" height="315" alt="" loading="lazy" />
+            <span class="city-card-body">
+              <h3>부산 지하철 시간 지도</h3>
+              <span>지하철역의 44%가 중심(서면)에서 30분 안 · 부산 도시철도</span>
+            </span>
+          </a>
+          <a class="city-card" href="../daegu/">
+            <img src="../og/thumb-daegu.jpg" width="600" height="315" alt="" loading="lazy" />
+            <span class="city-card-body">
+              <h3>대구 지하철 시간 지도</h3>
+              <span>지하철역의 72%가 중심(반월당)에서 30분 안 · 대구 도시철도</span>
+            </span>
+          </a>
+          <a class="city-card" href="../daejeon/">
+            <img src="../og/thumb-daejeon.jpg" width="600" height="315" alt="" loading="lazy" />
+            <span class="city-card-body">
+              <h3>대전 지하철 시간 지도</h3>
+              <span>지하철역의 95%가 중심(중앙로)에서 30분 안 · 대전 도시철도</span>
+            </span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p class="footer-links">도시&nbsp;: <a href="../seoul/">서울</a> · <a href="../busan/">부산</a> · <a href="../daegu/">대구</a> · <a href="../daejeon/">대전</a> · <a href="../gwangju/">광주</a></p>
+        <p class="footer-links"><a href="../credits/">출처와 라이선스</a></p>
+        <p class="footer-credits">
+          Camille Roux의 <a href="https://github.com/camilleroux/montpellier-temps-transport" rel="noopener">À portée de tram</a>(MIT 라이선스)을 포크해 만들었습니다.
+          원래 아이디어는 Anthony Castrio의 <a href="https://castrio.me/nyc/">NYC Transit Time Cartogram</a>과 Jules Grandin의
+          파리판(<a href="https://julesgrandin.github.io/paris-temps-transport/">C'est encore loin&nbsp;?</a>)입니다.
+          시간표&nbsp;: <a href="https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&amp;bbsNo=2&amp;nttNo=3785">GTFS 광주 도시철도</a> (광주광역시). 지도·구 경계·노선 궤적 © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap 기여자</a>.
+          계산된 데이터는 <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL</a>, 코드는 MIT 라이선스입니다.
+        </p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+    <script type="module" src="../app.js?v=b7305bcd"></script>
+  </body>
+</html>

@@ -1,100 +1,49 @@
-# À portée de tram
+# 대중교통 시간 지도
 
-Cartes interactives des temps de trajet en **tram et métro** (et, en option, en **bus**) dans les grandes villes françaises.
+지하철 소요시간으로 다시 그린 도시 지도. 출발지를 고르면 도시 곳곳까지 걸리는 시간이 색과 15·30분 등시선으로 표시된다.
 
-👉 **https://tram.camilleroux.com/**
+Camille Roux의 [À portée de tram](https://github.com/camilleroux/montpellier-temps-transport)(MIT)을 포크해 서울용으로 바꿨다.
+원래 아이디어는 Anthony Castrio의 [NYC Transit Time Cartogram](https://castrio.me/nyc/)과 Jules Grandin의
+[파리판](https://github.com/JulesGrandin/paris-temps-transport).
 
-20 villes : [Angers](https://tram.camilleroux.com/angers/) · [Bordeaux](https://tram.camilleroux.com/bordeaux/) · [Brest](https://tram.camilleroux.com/brest/) · [Clermont-Ferrand](https://tram.camilleroux.com/clermont-ferrand/) · [Dijon](https://tram.camilleroux.com/dijon/) · [Grenoble](https://tram.camilleroux.com/grenoble/) · [Le Mans](https://tram.camilleroux.com/le-mans/) · [Lille](https://tram.camilleroux.com/lille/) · [Lyon](https://tram.camilleroux.com/lyon/) · [Marseille](https://tram.camilleroux.com/marseille/) · [Montpellier](https://tram.camilleroux.com/montpellier/) · [Nantes](https://tram.camilleroux.com/nantes/) · [Nice](https://tram.camilleroux.com/nice/) · [Reims](https://tram.camilleroux.com/reims/) · [Rennes](https://tram.camilleroux.com/rennes/) · [Rouen](https://tram.camilleroux.com/rouen/) · [Saint-Étienne](https://tram.camilleroux.com/saint-etienne/) · [Strasbourg](https://tram.camilleroux.com/strasbourg/) · [Toulouse](https://tram.camilleroux.com/toulouse/) · [Tours](https://tram.camilleroux.com/tours/)
-
-Idée originale : le [NYC Transit Time Cartogram](https://castrio.me/nyc/) d'Anthony Castrio, puis sa
-[déclinaison parisienne](https://github.com/JulesGrandin/paris-temps-transport) par Jules Grandin.
-
-Fonctionnalités : heatmap et isochrones depuis un départ déplaçable, arrivée au clic avec itinéraire détaillé
-(lignes, correspondances, marche), recherche d'adresse (Base Adresse Nationale) ou de station, tram seul ou
-tram + bus, déplacement et zoom de la carte, lien de partage.
-
-## Lancer
+## 실행
 
 ```bash
-python3 build.py --fetch            # télécharge les sources, calcule chaque ville, génère pages et images d'aperçu
-python3 build.py lyon nice --no-og  # seulement ces villes, sans régénérer les images
+python3 fetch_data.py seoul --skip-gtfs   # OSM: 구 경계, 물·공원, 한강·다리
+python3 build_data.py seoul               # data/seoul/gtfs.zip 필요
+python3 build_pages.py
 python3 -m http.server 8000 --directory site
 ```
 
-Puis ouvrir [http://localhost:8000](http://localhost:8000). `build.py` affiche à la fin un tableau de contrôle par ville
-(jour de référence, poids, part du réseau à moins de 30 min, station la plus éloignée, fréquences).
+`python3 build.py seoul --fetch`로 한 번에 돌릴 수 있다. 미리보기 이미지(`tools/render_og.py`)에는 Chrome과 ImageMagick이 필요하고, 없으면 `--no-og`.
 
-Étapes séparées si besoin : `fetch_data.py <ville>`, `build_data.py <ville>`, `build_pages.py`,
-`tools/render_og.py <ville>|home|classements|all` (Chrome et ImageMagick requis), `tools/rankings.py` (classements
-lus directement dans les horaires : dernier tram du samedi soir au centre, fréquence à l'heure de pointe, station la plus desservie, ligne la plus longue,
-trajets par jour ; écrit `sources/rankings.json`, publié sur `/classements/` avec une page par classement). Une ville avec `"rankingsOnly": true` (Paris, dont la
-carte est celle de Jules Grandin, `externalUrl`) figure dans les classements sans avoir de carte ici. `node tools/check_trips.mjs <ville>` sonde les
-trajets depuis le centre jusqu'aux terminus et aux gares, et signale les vitesses anormales.
+## 서울 GTFS
 
-Les sources brutes (`data/<ville>/` : GTFS, communes, OSM) ne sont pas versionnées : elles restent en local et
-`fetch_data.py <ville>` les retélécharge. Seules les données calculées pour le site (`site/data/<ville>.json`) le sont.
+공개 GTFS 주소가 없어 국가교통DB GTFS를 신청해 받는다(ktdb.go.kr › 정보공개 › 자료신청 › 교통분석자료 신청 ›
+교통망 GIS DB › 대중교통). 표준 GTFS가 아니어서(하위 폴더, 도시철도 `route_type` 1·버스 0, 노선이 방향·분기별로 나뉨,
+`direction_id`·`shapes.txt` 없음) 변환한다:
 
-## Provenance des données
+```bash
+python3 tools/ktdb_gtfs.py seoul "대중교통GTFS(2025년 기준).zip"   # → data/seoul/gtfs.zip
+```
 
-Chaque calcul écrit `sources/<ville>.json` (versionné) : URL de chaque fichier source, date de téléchargement, taille et
-empreinte SHA-256, période couverte par le GTFS, jour de référence retenu, lignes exclues. `fetch_data.py` tient à jour
-le détail des téléchargements dans `data/<ville>/manifest.json`.
+도시철도 중 `osmBbox` 안에 역이 하나라도 있는 노선만 남기고, 노선 궤적은 OSM에서 그린다(`railGeometry: "osm"`, `osmRefAliases`).
+버스는 넣지 않았다.
 
-Le tableau complet (licence, date de téléchargement, validité du GTFS, jour de référence pour chaque ville) est
-généré dans [sources/README.md](sources/README.md).
+## 도시 설정 (`cities/<도시>.json`)
 
-Particularités : le GTFS TCL (Lyon) se télécharge à la main sur data.grandlyon.com (compte requis) ; les GTFS Tisséo
-(Toulouse) et STAR (Rennes) ne couvrent que quelques semaines et sont à retélécharger souvent ; à Marseille et dans
-les nouvelles villes (`"communes": "served"`), la carte se limite aux communes réellement desservies.
-Options de carte : `"arrondissements": "<code INSEE>"` trace les arrondissements municipaux dans la commune (Marseille),
-et `"view": "stops"` cadre la vue initiale sur tous les arrêts, bus compris, plutôt que sur le seul réseau tram/métro.
-`"rivers": ["La Loire", "L'Erdre"]` rend ces cours d'eau (et leurs bras, « La Loire - Bras de Pirmil ») infranchissables
-à pied ailleurs que sur un pont : la marche passe par le meilleur pont OSM, sinon il faut prendre le tram, le bus ou le
-bateau (`fetch_data.py <ville> --rivers-only` télécharge cours d'eau et ponts).
+필수: `slug`, `order`, `name`, `kind`(`tram`·`metro`·`metro+tram`), `network`, `metropole`, `boundaries`
+(`{"area": ISO3166-2 코드, "adminLevel": OSM 행정 레벨}`), `gtfsUrl`, `gtfsDataset`, `gtfsLicence`(`build_pages.py`의 `LICENCES` 키),
+`defaultFrom`, `searchExample`, `published`. 제목·문구 기본값은 `cities.py`.
 
-## Organisation du site
+선택: `rivers`(다리로만 건너는 강), `geocoderUrl`(주소 검색, 없으면 역 검색만), `excludeRouteTypes`, `excludeRouteNames`,
+`agencies`, `modeAccess`, `railGeometry: "osm"`·`osmRefAliases`·`osmRailRoutes`(GTFS에 궤적이 없을 때), `view: "land"`(지도 범위를 땅에 맞춤), `parksBbox`.
 
-- `/` : accueil, avec la liste des villes, le mode d'emploi et la FAQ. Les anciens liens de partage de Montpellier
-  (`/?from=…&to=…`) sont redirigés vers `/montpellier/`.
-- `/<ville>/` : carte, chiffres clés et FAQ de la ville, calculés à partir de `sources/<ville>.json`.
-- Modèles : `templates/home.html` et `templates/city.html`, assemblés par `build_pages.py`.
+## 모델
 
-## Ajouter une ville
+평일(화·목) 7~20시 시간표 기준. 역 사이 시간은 계획 소요시간의 중앙값, 대기는 배차 간격의 절반(1~15분), 환승은 도보 1.5분 + 대기,
+450m 안 정류장 사이 도보 환승, 도보는 직선거리 시속 4.5km. 실시간 정보는 반영하지 않는다.
 
-1. Créer `cities/<ville>.json` avec l'essentiel : `slug`, `order`, `name`, `kind` (`tram` par défaut, `metro` ou
-   `metro+tram`), `network`, `metropole`, `epci` (SIREN de l'intercommunalité), `gtfsUrl`, `gtfsDataset`, `gtfsLicence`
-   (`lo`, `odbl` ou `mobilites`), `defaultFrom` (centre de la carte), `searchExample`, `published`.
-   `cities.py` déduit le reste (titres, libellés, zones OSM…) ; chaque valeur peut être surchargée dans le JSON.
-2. Options utiles : `"communes": "served"` (seulement les communes desservies), `routeModes` (corriger le mode d'une
-   ligne), `modeAccess` (temps d'accès au quai), `agencies` (filtrer un GTFS régional), `railGeometry: "osm"` et
-   `osmRefAliases` (GTFS sans tracés), `seaDepartments` / `contextOsmRelations` (villes côtières : la mer en bleu).
-3. `python3 build.py <ville> --fetch`, puis vérifier le tableau de contrôle et `node tools/check_trips.mjs <ville>`.
+## 라이선스
 
-## Données
-
-- GTFS théoriques des réseaux via [transport.data.gouv.fr](https://transport.data.gouv.fr/) (TCL via [data.grandlyon.com](https://data.grandlyon.com/)), sous Licence Ouverte, ODbL ou Licence Mobilités selon les réseaux
-- Tracés des lignes (quand le GTFS n'en fournit pas), eau et parcs : © contributeurs OpenStreetMap (ODbL), via Overpass
-- Contours des communes de chaque métropole ([geo.api.gouv.fr](https://geo.api.gouv.fr/))
-- Recherche d'adresse côté navigateur : [api-adresse.data.gouv.fr](https://adresse.data.gouv.fr/)
-- Mesure d'audience : Cloudflare Web Analytics (sans cookie)
-
-## Modèle
-
-Les temps viennent des horaires GTFS d'un mardi ou jeudi de semaine scolaire type, entre 7 h et 20 h :
-
-- jour de référence = programme de service le plus courant parmi les mardis et jeudis à venir bien remplis ;
-- durée de chaque inter-station = médiane des durées planifiées ;
-- attente = moitié de l'intervalle moyen entre deux passages à l'arrêt (bornée entre 1 et 15 min) ;
-- correspondance = 1,5 min de marche + attente de la ligne suivante ; marche possible entre arrêts proches (< 450 m) ;
-- marche à pied à 75 m/min (4,5 km/h) à vol d'oiseau, sans pénalité d'accès (arrêts en surface).
-
-Pas de temps réel ni de perturbations. Les trajets à la demande (TaD) sont exclus.
-
-## Licences
-
-- Code : licence MIT (voir [LICENSE](LICENSE)).
-- Données calculées (`site/data/*.json`, `sources/*.json`) : bases de données dérivées publiées sous
-  [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), comme l'exigent OpenStreetMap et les GTFS sous ODbL ou
-  Licence Mobilités.
-- Mentions légales et licence de chaque source : https://tram.camilleroux.com/mentions-legales/
-
+코드 MIT([LICENSE](LICENSE)). 계산된 데이터(`site/data/*.json`, `sources/*.json`)는 OpenStreetMap 파생이라 ODbL.

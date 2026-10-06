@@ -1,0 +1,38 @@
+{
+  "slug": "daejeon",
+  "order": 4,
+  "name": "대전",
+  "network": "대전 도시철도",
+  "metropole": "대전광역시",
+  "linePrefix": "대전",
+  "boundaries": {
+    "ids": [
+      3888601,
+      3889016,
+      3889109,
+      3890427,
+      3890428
+    ]
+  },
+  "osmRailRoutes": "subway",
+  "osmRefAliases": {
+    "1": "1호선"
+  },
+  "rivers": [
+    "갑천"
+  ],
+  "defaultFrom": {
+    "lat": 36.32867,
+    "lon": 127.42579,
+    "label": "중앙로"
+  },
+  "searchExample": "정부청사",
+  "kind": "metro",
+  "gtfsManual": "국가교통DB GTFS를 tools/ktdb_gtfs.py로 변환",
+  "gtfsUrl": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsDataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsLicence": "ktdb",
+  "railGeometry": "osm",
+  "view": "land",
+  "published": "2026-10-06"
+}

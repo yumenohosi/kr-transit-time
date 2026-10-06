@@ -1,0 +1,40 @@
+{
+  "slug": "busan",
+  "order": 2,
+  "name": "부산",
+  "network": "부산 도시철도",
+  "metropole": "부산광역시",
+  "linePrefix": "부산",
+  "boundaries": {
+    "area": "KR-26",
+    "adminLevel": "6"
+  },
+  "osmRailRoutes": "subway|light_rail|train|monorail",
+  "osmRefAliases": {
+    "1": "1호선",
+    "2": "2호선",
+    "3": "3호선",
+    "4": "4호선",
+    "BGL": "부산김해경전철",
+    "동해": "동해선"
+  },
+  "rivers": [
+    "낙동강",
+    "서낙동강"
+  ],
+  "defaultFrom": {
+    "lat": 35.15735,
+    "lon": 129.0591,
+    "label": "서면"
+  },
+  "searchExample": "해운대",
+  "kind": "metro",
+  "gtfsManual": "국가교통DB GTFS를 tools/ktdb_gtfs.py로 변환",
+  "gtfsUrl": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsDataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsLicence": "ktdb",
+  "railGeometry": "osm",
+  "view": "land",
+  "coastline": true,
+  "published": "2026-10-06"
+}

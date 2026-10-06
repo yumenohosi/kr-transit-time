@@ -25,6 +25,7 @@ from cities import load_city
 ROOT = Path(__file__).resolve().parent
 
 LAND_PAD_METERS = 1200.0
+SEA_PAD_METERS = 10_000.0
 VIEW_PAD_METERS = 900.0
 
 GRID_CELL_METERS = 200.0
@@ -478,6 +479,107 @@ def extract_water_and_parks(data_dir: Path, bounds) -> Tuple[MultiPolygon, Multi
             elif tags.get("leisure") == "park" and area >= MIN_PARK_AREA:
                 parks.append([simplify_ring(ring, 15.0) for ring in polygon])
     return masked, water, parks
+
+
+def extract_sea(data_dir: Path, rect: Tuple[float, float, float, float]) -> MultiPolygon:
+    """Sea inside `rect`, from the OSM coastline (land on its left): the rectangle with the land as holes. Korean
+    district boundaries run far out to sea; the sea is cut out of them like a large lake."""
+    path = data_dir / "osm_coastline.json"
+    if not path.exists():
+        return []
+    x0, y0, x1, y1 = rect
+    starts = {}
+    for element in load_json(path)["elements"]:
+        points = way_points(element.get("geometry") or [])
+        if len(points) >= 2:
+            starts[points[0]] = points
+    # Ways joined end to start into chains: closed ones are islands, open ones come in and out of the rectangle.
+    ends = {way[-1] for way in starts.values()}
+    chains, used = [], set()
+    for first in [first for first in starts if first not in ends] + list(starts):
+        if first in used:
+            continue
+        chain = list(starts[first])
+        used.add(first)
+        while chain[-1] != chain[0] and chain[-1] in starts and chain[-1] not in used:
+            used.add(chain[-1])
+            chain.extend(starts[chain[-1]][1:])
+        chains.append(chain)
+
+    def inside(point: Point) -> bool:
+        return x0 <= point[0] <= x1 and y0 <= point[1] <= y1
+
+    def perimeter(point: Point) -> float:
+        """Position along the rectangle, counter-clockwise from its south-west corner (0 to 4)."""
+        x, y = point
+        edges = [(abs(y - y0), (x - x0) / (x1 - x0)), (abs(x - x1), 1 + (y - y0) / (y1 - y0)),
+                 (abs(y - y1), 2 + (x1 - x) / (x1 - x0)), (abs(x - x0), 3 + (y1 - y) / (y1 - y0))]
+        return min(edges)[1] % 4
+
+    def clip(p: Point, q: Point):
+        """Liang-Barsky: the part of segment pq inside the rectangle, as (t0, t1), or None."""
+        t0, t1 = 0.0, 1.0
+        dx, dy = q[0] - p[0], q[1] - p[1]
+        for edge_p, edge_q in ((-dx, p[0] - x0), (dx, x1 - p[0]), (-dy, p[1] - y0), (dy, y1 - p[1])):
+            if edge_p == 0:
+                if edge_q < 0:
+                    return None
+                continue
+            t = edge_q / edge_p
+            if edge_p < 0:
+                t0 = max(t0, t)
+            else:
+                t1 = min(t1, t)
+        return (t0, t1) if t0 < t1 else None
+
+    rings, pieces = [], []
+    for chain in chains:
+        if chain[0] == chain[-1] and all(inside(point) for point in chain):
+            rings.append(chain)
+            continue
+        if chain[0] == chain[-1]:
+            outside = next(i for i, point in enumerate(chain) if not inside(point))
+            chain = chain[outside:-1] + chain[: outside + 1]
+        piece = None
+        for p, q in zip(chain, chain[1:]):
+            span = clip(p, q)
+            if span is None:
+                continue
+            t0, t1 = span
+            at = lambda t: (p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1]))
+            if piece is None:
+                if t0 == 0.0:
+                    print(f"  해안선이 사각형 안에서 끊김 ({p}), 무시")
+                    break
+                piece = [at(t0)]
+            piece.append(at(t1) if t1 < 1.0 else q)
+            if t1 < 1.0:
+                pieces.append(piece)
+                piece = None
+    # Each piece leaves the rectangle with the land on its left: follow the edge counter-clockwise to the next one in.
+    entries = [perimeter(piece[0]) for piece in pieces]
+    free = set(range(len(pieces)))
+    while free:
+        start = free.pop()
+        ring = list(pieces[start])
+        while True:
+            out = perimeter(ring[-1])
+            following = min(free | {start}, key=lambda i: (entries[i] - out) % 4 or 4)
+            gap = (entries[following] - out) % 4 or 4
+            corners = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+            for k in range(1, 5):
+                corner = (math.floor(out) + k) % 4
+                if (corner - out) % 4 < gap:
+                    ring.append(corners[corner])
+            if following == start:
+                ring.append(ring[0])
+                break
+            free.discard(following)
+            ring.extend(pieces[following])
+        rings.append(ring)
+    land = [simplify_ring(ring, MIN_RING_DISTANCE) for ring in rings]
+    land = [ring for ring in land if abs(ring_area(ring)) >= MIN_WATER_AREA]
+    return [[[(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)], *land]]
 
 
 def extract_context(data_dir: Path, city: dict) -> MultiPolygon:
@@ -966,7 +1068,7 @@ def write_provenance(city: dict, data_dir: Path, reference_date: date, route_inf
             "feedInfo": feed_info,
             "servicePeriod": [days[0].isoformat(), days[-1].isoformat()] if days else None,
         },
-        "communes": {"metropole": city["metropole"], "epci": city["epci"], **manifest.get("communes.geojson", {})},
+        "communes": {"metropole": city["metropole"], "boundaries": city.get("boundaries"), **manifest.get("communes.geojson", {})},
         **({"arrondissements": manifest["arrondissements.geojson"]} if "arrondissements.geojson" in manifest else {}),
         "openStreetMap": {
             "licence": "ODbL, © contributeurs OpenStreetMap",
@@ -1002,6 +1104,14 @@ def main() -> None:
     communes, land = extract_communes(data_dir, city, complexes)
     arrondissements = extract_arrondissements(data_dir, city)
     bounds = multipolygon_bounds(land, LAND_PAD_METERS)
+    # The sea reaches past the frame, for the zoomed-out view (the coastline is fetched 0.15° around the city).
+    sea = extract_sea(data_dir, (bounds[0] - SEA_PAD_METERS, bounds[1] - SEA_PAD_METERS, bounds[2] + SEA_PAD_METERS, bounds[3] + SEA_PAD_METERS))
+    if sea:
+        # Frame the land only, not the districts' waters.
+        sea_set = PolygonSet(sea)
+        coast = [point for polygon in land for point in polygon[0] if not sea_set.contains(point)]
+        bounds = (min(x for x, _ in coast) - LAND_PAD_METERS, min(y for _, y in coast) - LAND_PAD_METERS,
+                  max(x for x, _ in coast) + LAND_PAD_METERS, max(y for _, y in coast) + LAND_PAD_METERS)
     cols = round((bounds[2] - bounds[0]) / GRID_CELL_METERS)
     rows = round((bounds[3] - bounds[1]) / GRID_CELL_METERS)
     masked_water, water, parks = extract_water_and_parks(data_dir, bounds)
@@ -1042,7 +1152,18 @@ def main() -> None:
             max(station["point"][0] for station in stations) + VIEW_PAD_METERS,
             max(station["point"][1] for station in stations) + VIEW_PAD_METERS,
         )
-    cells, mask = build_grid(land, masked_water, stations, bounds, cols, rows, rivers)
+    elif city.get("view") == "land":
+        # Lines running far beyond the map (Seoul's suburban rail, to Cheonan or Chuncheon): frame the land drawn.
+        view_bounds = bounds
+    cells, mask = build_grid(land, masked_water + sea, stations, bounds, cols, rows, rivers)
+    if sea:
+        # A district's centre can lie in its waters: put its name on its land cell nearest to the centre of its land.
+        for commune in communes:
+            area = PolygonSet(commune["polygons"])
+            points = [cell["point"] for cell in cells if area.contains(cell["point"])]
+            if points:
+                centre = (statistics.fmean(x for x, _ in points), statistics.fmean(y for _, y in points))
+                commune["label"] = min(points, key=lambda point: dist(point, centre))
 
     output = {
         "meta": {
@@ -1054,6 +1175,8 @@ def main() -> None:
             "gridRows": rows,
             "walkMetersPerMinute": WALK_METERS_PER_MINUTE,
             "originStationCount": ORIGIN_NEAREST_STATIONS,
+            "transferWalk": TRANSFER_WALK,
+            "transferRadius": INTER_COMPLEX_WALK_RADIUS,
             "sea": bool(context),
         },
         "context": [serialize_polygon(polygon) for polygon in context],
@@ -1062,13 +1185,19 @@ def main() -> None:
         **({"rivers": [[round_point(point) for point in line] for line in river_lines]} if river_lines else {}),
         **({"bridges": [[round_point(a), round_point(b), round(length, 1)] for a, b, length in bridges]} if bridges else {}),
         "water": [serialize_polygon(polygon) for polygon in masked_water + water],
+        **({"coastSea": [serialize_polygon(polygon) for polygon in sea]} if sea else {}),
         "parks": [serialize_polygon(polygon) for polygon in parks],
         "routes": routes,
         "routeInfo": route_info,
         "stations": [{**station, "point": round_point(station["point"])} for station in stations],
         "routeStates": route_states,
         "stationStates": station_states,
-        "adjacency": adjacency,
+        # Transfers touching a bus are left out (98 % of the edges in Seoul): site/app.js rebuilds them with the same rules.
+        "adjacency": [
+            [edge for edge in edges if route_states[edge[0]]["routeId"] == route_states[i]["routeId"]
+             or (route_info[route_states[edge[0]]["routeId"]]["rail"] and route_info[route_states[i]["routeId"]]["rail"])]
+            for i, edges in enumerate(adjacency)
+        ],
         "cells": cells,
         "mask": mask,
     }

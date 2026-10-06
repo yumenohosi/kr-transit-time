@@ -1,0 +1,33 @@
+{
+  "slug": "gwangju",
+  "order": 5,
+  "name": "광주",
+  "network": "광주 도시철도",
+  "metropole": "광주광역시",
+  "linePrefix": "광주",
+  "boundaries": {
+    "area": "KR-29",
+    "adminLevel": "6"
+  },
+  "osmRailRoutes": "subway",
+  "osmRefAliases": {
+    "1": "1호선"
+  },
+  "rivers": [
+    "영산강"
+  ],
+  "defaultFrom": {
+    "lat": 35.14673,
+    "lon": 126.91983,
+    "label": "문화전당"
+  },
+  "searchExample": "상무",
+  "kind": "metro",
+  "gtfsManual": "국가교통DB GTFS를 tools/ktdb_gtfs.py로 변환",
+  "gtfsUrl": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsDataset": "https://www.ktdb.go.kr/www/selectBbsNttView.do?key=45&bbsNo=2&nttNo=3785",
+  "gtfsLicence": "ktdb",
+  "railGeometry": "osm",
+  "view": "land",
+  "published": "2026-10-06"
+}
