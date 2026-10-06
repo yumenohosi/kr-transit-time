@@ -350,15 +350,18 @@ function solveFrom(point) {
   const heap = new MinHeap();
 
   // Les arrêts les plus proches à vol d'oiseau, puis leur vraie distance à pied (détour par un pont).
-  const seeds = data.stations
-    .map((station, index) => ({ index, walk: walkMinutes(hypot(point, station.point)) }))
-    .filter((seed) => stationUsable(seed.index))
-    .sort((a, b) => a.walk - b.walk)
-    .slice(0, data.meta.originStationCount * 4)
-    .map((seed) => ({ index: seed.index, walk: walkMinutes(walkMeters(point, data.stations[seed.index].point)) }))
-    .filter((seed) => Number.isFinite(seed.walk))
-    .sort((a, b) => a.walk - b.walk)
-    .slice(0, data.meta.originStationCount);
+  const nearest = (usable) =>
+    data.stations
+      .map((station, index) => ({ index, walk: walkMinutes(hypot(point, station.point)) }))
+      .filter((seed) => usable(seed.index))
+      .sort((a, b) => a.walk - b.walk)
+      .slice(0, data.meta.originStationCount * 4)
+      .map((seed) => ({ index: seed.index, walk: walkMinutes(walkMeters(point, data.stations[seed.index].point)) }))
+      .filter((seed) => Number.isFinite(seed.walk))
+      .sort((a, b) => a.walk - b.walk)
+      .slice(0, data.meta.originStationCount);
+  // Avec le bus, les arrêts de bus proches prendraient toutes les places : les stations de métro proches restent candidates.
+  const seeds = [...nearest(stationUsable), ...(app.includeBus ? nearest((index) => data.stations[index].rail) : [])];
 
   for (const seed of seeds) {
     for (const state of data.stationStates[seed.index]) {
